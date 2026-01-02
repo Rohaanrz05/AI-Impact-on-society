@@ -1,3 +1,4 @@
+pip install plotly
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -59,4 +60,5 @@ with tabs[1]:
         
         if submit:
             # This is where your ML model .predict() would go
+
             st.success(f"Based on your profile, your predicted AI Usage Score is: 4.2 / 5")
