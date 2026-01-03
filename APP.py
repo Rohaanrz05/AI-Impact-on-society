@@ -2,91 +2,81 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# Set page config
-st.set_page_config(page_title="AI & Society Dashboard", layout="wide")
+# Set page configuration
+st.set_page_config(page_title="AI Impact Dashboard", layout="wide")
 
-
-# Load data with multiple encoding attempts
+# Function to load data with encoding fallback
 @st.cache_data
 def load_data():
-    encodings = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252', 'windows-1252']
-
+    file_path = 'The impact of artificial intelligence on society.csv'
+    # List of encodings to try
+    encodings = ['utf-8', 'ISO-8859-1', 'cp1252']
+    
     for encoding in encodings:
         try:
-            df = pd.read_csv('The impact of artificial intelligence on society.csv',
-                             encoding=encoding,
-                             encoding_errors='ignore')
+            df = pd.read_csv(file_path, encoding=encoding)
             return df
-        except (UnicodeDecodeError, LookupError):
+        except UnicodeDecodeError:
             continue
-        except Exception as e:
-            st.error(f"Error loading file: {str(e)}")
-            return None
-
-    st.error("Could not read the CSV file with any encoding")
     return None
 
-
-# Load data
+# Load the dataset
 df = load_data()
 
-# Check if data loaded successfully
-if df is None:
-    st.error("Failed to load data. Please check your CSV file.")
-    st.stop()
+if df is not None:
+    st.title("🌐 The Impact of AI on Society")
+    st.markdown("Exploring public perception, trust, and usage of Artificial Intelligence.")
 
-# --- SIDEBAR FILTERS ---
-st.sidebar.header("Filter Results")
-gender_filter = st.sidebar.multiselect("Select Gender:", options=df['What is your gender?'].unique(),
-                                       default=df['What is your gender?'].unique())
-age_filter = st.sidebar.multiselect("Select Age Range:", options=df['What is your age range?'].unique(),
-                                    default=df['What is your age range?'].unique())
+    # --- SIDEBAR FILTERS ---
+    st.sidebar.header("Filter Data")
+    
+    # Filter by Gender
+    gender_list = df['Gender'].unique().tolist()
+    selected_gender = st.sidebar.multiselect("Select Gender", gender_list, default=gender_list)
 
-# Filtered Data
-df_selection = df.query("`What is your gender?` == @gender_filter & `What is your age range?` == @age_filter")
+    # Filter by Age
+    age_list = df['Age'].unique().tolist()
+    selected_age = st.sidebar.multiselect("Select Age Group", age_list, default=age_list)
 
-# --- MAIN PAGE ---
-st.title("📊 The Impact of AI on Society")
-st.markdown("Exploring public perception, trust, and the future of AI.")
+    # Apply filters
+    filtered_df = df[(df['Gender'].isin(selected_gender)) & (df['Age'].isin(selected_age))]
 
-tabs = st.tabs(["📈 Data Insights", "🔮 Predictor Tool"])
+    # --- MAIN DASHBOARD TABS ---
+    tab1, tab2, tab3 = st.tabs(["📊 Overview", "🧠 Sentiment Analysis", "🔮 AI Predictor"])
 
-with tabs[0]:
-    # Key Metrics
-    col1, col2, col3 = st.columns(3)
-    avg_usage = df_selection[
-        'Please rate how actively you use AI-powered products in your daily life on a scale from 1 to 5.'].mean()
-    trust_pct = (df_selection['Do you generally trust artificial intelligence (AI)?'] == 'I trust it').mean() * 100
+    with tab1:
+        st.subheader("General Statistics")
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.write("**Total Respondents:**", len(filtered_df))
+            # Pie chart for Education
+            fig_edu = px.pie(filtered_df, names='Education', title='Education Levels')
+            st.plotly_chart(fig_edu, use_container_width=True)
 
-    col1.metric("Total Respondents", len(df_selection))
-    col2.metric("Avg. AI Usage Score", f"{avg_usage:.2f}/5")
-    col3.metric("Trust AI", f"{trust_pct:.1f}%")
+        with col2:
+            # Bar chart for Trust levels
+            # Note: Ensure the column name matches exactly as per your CSV
+            trust_col = 'Do you trust the artificial intelligence systems?'
+            if trust_col in filtered_df.columns:
+                fig_trust = px.histogram(filtered_df, x=trust_col, color='Gender', 
+                                         title='Trust in AI Systems', barmode='group')
+                st.plotly_chart(fig_trust, use_container_width=True)
 
-    # Visualizations
-    st.divider()
-    c1, c2 = st.columns(2)
+    with tab2:
+        st.subheader("Usage & Sentiment")
+        # Scatter plot or box plot for Usage frequency
+        usage_col = 'How often do you use products that use AI? (Example: ChatGPT, Netflix, Siri, etc.)'
+        if usage_col in filtered_df.columns:
+            fig_usage = px.box(filtered_df, x='Education', y=usage_col, 
+                               points="all", title="AI Usage Frequency by Education")
+            st.plotly_chart(fig_usage, use_container_width=True)
 
-    with c1:
-        fig_trust = px.histogram(df_selection, x="Do you generally trust artificial intelligence (AI)?",
-                                 title="General Trust in AI", color_discrete_sequence=['#636EFA'])
-        st.plotly_chart(fig_trust, use_container_width=True)
+    with tab3:
+        st.subheader("Predictive Insights")
+        st.info("This section can be used to predict user sentiment based on demographics.")
+        st.write("Current data shows that the most frequent users are in the following age groups:")
+        st.write(filtered_df['Age'].value_counts())
 
-    with c2:
-        fig_edu = px.box(df_selection, x="What is your education level?",
-                         y="Please rate how actively you use AI-powered products in your daily life on a scale from 1 to 5.",
-                         title="AI Usage by Education Level")
-        st.plotly_chart(fig_edu, use_container_width=True)
-
-with tabs[1]:
-    st.subheader("Predict Your AI Sentiment")
-    st.info("Input your demographics below to see your predicted 'AI Usage Level' based on our ML model.")
-
-    with st.form("predictor_form"):
-        age = st.selectbox("Age Range", df['What is your age range?'].unique())
-        edu = st.selectbox("Education Level", df['What is your education level?'].unique())
-        job = st.selectbox("Employment Status", df['What is your employment status?'].unique())
-        submit = st.form_submit_button("Predict Result")
-
-        if submit:
-            # This is where your ML model .predict() would go
-            st.success(f"Based on your profile, your predicted AI Usage Score is: 4.2 / 5")
+else:
+    st.error("Failed to load the dataset. Please check if the file name and encoding are correct.")
