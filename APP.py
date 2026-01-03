@@ -6,7 +6,7 @@ from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score
 import numpy as np
 
 # --- PAGE CONFIG ---
@@ -133,7 +133,14 @@ def load_and_clean_data():
             'Do you think your own job could be affected by artificial intelligence (AI)?': 'AI Job Impact'
         }
         df.rename(columns=new_columns, inplace=True)
+        # Strip whitespace from column names
         df.columns = df.columns.str.strip()
+        
+        # --- FIX FOR 0% JOB CONCERN ---
+        # Strip whitespace from all string columns to ensure 'Yes ' becomes 'Yes'
+        for col in df.select_dtypes(include=['object']).columns:
+            df[col] = df[col].astype(str).str.strip()
+            
         if 'ID' in df.columns:
             df.drop('ID', axis=1, inplace=True)
     return df
@@ -234,11 +241,14 @@ if df is not None:
             """, unsafe_allow_html=True)
         
         with col_c:
-            job_concern = (df['AI Job Impact'] == 'Yes').mean() * 100
+            # FIX: Ensure we match 'Yes' correctly after stripping whitespace
+            job_concern_count = len(df[df['AI Job Impact'].astype(str).str.lower() == 'yes'])
+            job_concern_pct = (job_concern_count / len(df)) * 100
+            
             st.markdown(f"""
                 <div class='model-comparison'>
                     <h3 style='color: #f59e0b;'>⚠️ Job Concern</h3>
-                    <h1 style='color: #f59e0b; margin: 10px 0;'>{job_concern:.1f}%</h1>
+                    <h1 style='color: #f59e0b; margin: 10px 0;'>{job_concern_pct:.1f}%</h1>
                     <p style='color: #94a3b8;'>worry about job impact</p>
                 </div>
             """, unsafe_allow_html=True)
@@ -351,7 +361,8 @@ if df is not None:
         X_trust = ml_df_trust[features_trust]
         y_trust = ml_df_trust[target_trust]
         
-        # Train models UNCONDITIONALLY so they are always available
+        # --- FIX FOR NAME ERROR ---
+        # Train models UNCONDITIONALLY so they exist regardless of user selection
         rf_model_emp, xgb_model_emp, rf_acc_emp, xgb_acc_emp, _, _ = train_models(X_emp, y_emp, "employment")
         rf_model_trust, xgb_model_trust, rf_acc_trust, xgb_acc_trust, _, _ = train_models(X_trust, y_trust, "trust")
 
@@ -446,7 +457,7 @@ if df is not None:
             u_edu = c_right.selectbox("🎓 Education Level", encoders_emp['Education Level'].classes_)
             u_use = c_right.select_slider("📱 AI Usage Level", options=[1, 2, 3, 4, 5], value=3)
             
-            # Show AI Knowledge if predicting Trust OR Both
+            # Only show AI Knowledge if predicting Trust OR Both
             if "Trust" in prediction_target or "Both" in prediction_target:
                 u_knowledge = st.selectbox("🧠 AI Knowledge Level", encoders_trust['AI Knowledge'].classes_)
 
@@ -458,7 +469,6 @@ if df is not None:
                 in_gen_emp = encoders_emp['Gender'].transform([u_gen])[0]
                 in_edu_emp = encoders_emp['Education Level'].transform([u_edu])[0]
                 
-                # FIX: Check for Both here as well so variables are defined
                 if "Trust" in prediction_target or "Both" in prediction_target:
                     in_age_trust = encoders_trust['Age Range'].transform([u_age])[0]
                     in_gen_trust = encoders_trust['Gender'].transform([u_gen])[0]
@@ -557,6 +567,7 @@ if df is not None:
                             </div>
                         </div>
                     """, unsafe_allow_html=True)
+
     else:  # Model Comparison
         st.markdown("<h1 style='text-align: center;'>⚡ Model Performance Comparison</h1>", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
@@ -742,4 +753,3 @@ if df is not None:
 
 else:
     st.error("❌ Data file not found. Please ensure the CSV is uploaded correctly.")
-
