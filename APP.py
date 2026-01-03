@@ -6,7 +6,7 @@ import plotly.express as px
 st.set_page_config(page_title="AI & Society Dashboard", layout="wide")
 
 # Load data
-df = pd.read_csv('The impact of artificial intelligence on society.csv')
+df = pd.read_csv('The impact of artificial intelligence on society.csv', encoding='latin-1')
 
 # --- SIDEBAR FILTERS ---
 st.sidebar.header("Filter Results")
