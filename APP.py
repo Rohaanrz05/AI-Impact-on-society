@@ -1,4 +1,4 @@
-import streamlit as st
+﻿import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -448,33 +448,59 @@ if df is not None:
         col_imp1, col_imp2 = st.columns(2)
         
         with col_imp1:
-            # Random Forest Feature Importance
+            # Random Forest Feature Importance - FIXED
             rf_importance = pd.DataFrame({
                 'Feature': features,
                 'Importance': rf_model.feature_importances_
             }).sort_values('Importance', ascending=True)
             
-            fig_rf_imp = px.barh(rf_importance, x='Importance', y='Feature',
-                                title="Random Forest Feature Importance",
-                                template="plotly_dark",
-                                color='Importance',
-                                color_continuous_scale='Greens')
-            fig_rf_imp.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+            fig_rf_imp = go.Figure(go.Bar(
+                x=rf_importance['Importance'],
+                y=rf_importance['Feature'],
+                orientation='h',
+                marker=dict(
+                    color=rf_importance['Importance'],
+                    colorscale='Greens',
+                    showscale=True
+                )
+            ))
+            fig_rf_imp.update_layout(
+                title="Random Forest Feature Importance",
+                template="plotly_dark",
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                xaxis_title="Importance",
+                yaxis_title="Feature",
+                height=400
+            )
             st.plotly_chart(fig_rf_imp, use_container_width=True)
         
         with col_imp2:
-            # XGBoost Feature Importance
+            # XGBoost Feature Importance - FIXED
             xgb_importance = pd.DataFrame({
                 'Feature': features,
                 'Importance': xgb_model.feature_importances_
             }).sort_values('Importance', ascending=True)
             
-            fig_xgb_imp = px.barh(xgb_importance, x='Importance', y='Feature',
-                                 title="XGBoost Feature Importance",
-                                 template="plotly_dark",
-                                 color='Importance',
-                                 color_continuous_scale='Blues')
-            fig_xgb_imp.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+            fig_xgb_imp = go.Figure(go.Bar(
+                x=xgb_importance['Importance'],
+                y=xgb_importance['Feature'],
+                orientation='h',
+                marker=dict(
+                    color=xgb_importance['Importance'],
+                    colorscale='Blues',
+                    showscale=True
+                )
+            ))
+            fig_xgb_imp.update_layout(
+                title="XGBoost Feature Importance",
+                template="plotly_dark",
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                xaxis_title="Importance",
+                yaxis_title="Feature",
+                height=400
+            )
             st.plotly_chart(fig_xgb_imp, use_container_width=True)
 
         # Accuracy Comparison Chart
