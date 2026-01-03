@@ -1,4 +1,4 @@
-﻿import streamlit as st
+import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -96,6 +96,14 @@ st.markdown("""
         border-left: 4px solid #8b5cf6;
         margin: 10px 0;
     }
+    .dual-prediction {
+        background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+        padding: 30px;
+        border-radius: 15px;
+        margin: 20px 0;
+        text-align: center;
+        border: 3px solid #f472b6;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -108,7 +116,8 @@ def load_and_clean_data():
         try:
             df = pd.read_csv(file_path, encoding=enc)
             break
-        except: continue
+        except:
+            continue
     
     if df is not None:
         new_columns = {
@@ -125,11 +134,12 @@ def load_and_clean_data():
         }
         df.rename(columns=new_columns, inplace=True)
         df.columns = df.columns.str.strip()
-        if 'ID' in df.columns: df.drop('ID', axis=1, inplace=True)
+        if 'ID' in df.columns:
+            df.drop('ID', axis=1, inplace=True)
     return df
 
 @st.cache_resource
-def train_models(X, y):
+def train_models(X, y, model_type="employment"):
     """Train both Random Forest and XGBoost models"""
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     
@@ -140,7 +150,7 @@ def train_models(X, y):
     rf_accuracy = accuracy_score(y_test, rf_pred)
     
     # XGBoost
-    xgb_model = XGBClassifier(n_estimators=150, max_depth=6, learning_rate=0.1, random_state=42)
+    xgb_model = XGBClassifier(n_estimators=150, max_depth=6, learning_rate=0.1, random_state=42, eval_metric='logloss')
     xgb_model.fit(X_train, y_train)
     xgb_pred = xgb_model.predict(X_test)
     xgb_accuracy = accuracy_score(y_test, xgb_pred)
@@ -161,13 +171,13 @@ if df is not None:
         st.divider()
         st.markdown("""
             <div style='background: #334155; padding: 15px; border-radius: 10px; text-align: center;'>
-                <p style='margin: 0; color: #60a5fa; font-size: 14px;'>📈 <b>Model Accuracy</b></p>
-                <p style='margin: 5px 0 0 0; color: #10b981; font-size: 24px; font-weight: 700;'>89.2%</p>
+                <p style='margin: 0; color: #60a5fa; font-size: 14px;'>📈 <b>Dual Model System</b></p>
+                <p style='margin: 5px 0 0 0; color: #10b981; font-size: 20px; font-weight: 700;'>Employment & Trust</p>
             </div>
         """, unsafe_allow_html=True)
         
         st.markdown("<br>", unsafe_allow_html=True)
-        st.info("💡 **Tip:** Compare Random Forest vs XGBoost in the Prediction Lab!")
+        st.info("💡 **Tip:** Predict both Employment Status AND Trust in AI!")
 
     if menu == "📊 Dashboard":
         st.markdown("<h1 style='text-align: center;'>🌐 AI Social Impact Dashboard</h1>", unsafe_allow_html=True)
@@ -187,16 +197,16 @@ if df is not None:
         with col1:
             st.subheader("📊 Distribution of Age Ranges")
             fig_age = px.histogram(df, x='Age Range', color='Age Range', 
-                                  template="plotly_dark",
-                                  color_discrete_sequence=px.colors.qualitative.Bold)
+                                   template="plotly_dark",
+                                   color_discrete_sequence=px.colors.qualitative.Bold)
             fig_age.update_layout(showlegend=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig_age, use_container_width=True)
 
         with col2:
             st.subheader("🤝 Trust in AI vs. AI Knowledge")
             fig_trust_know = px.histogram(df, x='AI Knowledge', color='Trust in AI', barmode='group',
-                                         template="plotly_dark", 
-                                         color_discrete_sequence=px.colors.qualitative.Vivid)
+                                          template="plotly_dark", 
+                                          color_discrete_sequence=px.colors.qualitative.Vivid)
             fig_trust_know.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig_trust_know, use_container_width=True)
 
@@ -251,8 +261,8 @@ if df is not None:
         with col_b:
             st.subheader("💼 AI Job Impact by Education")
             fig_job = px.histogram(df, x='Education Level', color='AI Job Impact', barmode='group',
-                                  template="plotly_dark",
-                                  color_discrete_sequence=px.colors.qualitative.Safe)
+                                   template="plotly_dark",
+                                   color_discrete_sequence=px.colors.qualitative.Safe)
             fig_job.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig_job, use_container_width=True)
 
@@ -271,7 +281,7 @@ if df is not None:
         if len(numeric_cols) > 0:
             # Create encoded version for correlation
             corr_df = df.copy()
-            for col in ['Age Range', 'Gender', 'Education Level', 'Employment Status', 'AI Knowledge']:
+            for col in ['Age Range', 'Gender', 'Education Level', 'Employment Status', 'AI Knowledge', 'Trust in AI']:
                 if col in corr_df.columns:
                     le = LabelEncoder()
                     corr_df[col + '_encoded'] = le.fit_transform(corr_df[col].astype(str))
@@ -289,115 +299,304 @@ if df is not None:
                 textfont={"size": 10}
             ))
             fig_corr.update_layout(template="plotly_dark", height=500,
-                                  plot_bgcolor='rgba(0,0,0,0)', 
-                                  paper_bgcolor='rgba(0,0,0,0)')
+                                   plot_bgcolor='rgba(0,0,0,0)', 
+                                   paper_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig_corr, use_container_width=True)
 
     elif menu == "🔮 Prediction Lab":
         st.markdown("<h1 style='text-align: center;'>🔮 AI Prediction Lab</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 18px;'>Predict Employment Status using Machine Learning</p>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 18px;'>Dual Prediction System: Employment Status & Trust in AI</p>", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
+
+        # Prediction Target Selection
+        st.markdown("### 🎯 Choose What to Predict:")
+        prediction_target = st.radio("", 
+                                     ["💼 Employment Status Only", 
+                                      "🤝 Trust in AI Only", 
+                                      "🔥 Both (Dual Prediction)"],
+                                     horizontal=True)
 
         # Model Selection
         model_choice = st.radio("**Choose Your ML Model:**", 
                                ["🌲 Random Forest", "⚡ XGBoost (Faster & More Accurate)"],
                                horizontal=True)
 
-        features = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating']
-        target = 'Employment Status'
+        st.divider()
+
+        # Prepare data for Employment Status
+        features_employment = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating']
+        target_employment = 'Employment Status'
         
-        ml_df = df[features + [target]].dropna()
-        encoders = {}
-        for col in ['Age Range', 'Gender', 'Education Level', target]:
+        ml_df_emp = df[features_employment + [target_employment]].dropna()
+        encoders_emp = {}
+        for col in ['Age Range', 'Gender', 'Education Level', target_employment]:
             le = LabelEncoder()
-            ml_df[col] = le.fit_transform(ml_df[col].astype(str))
-            encoders[col] = le
+            ml_df_emp[col] = le.fit_transform(ml_df_emp[col].astype(str))
+            encoders_emp[col] = le
 
-        X = ml_df[features]
-        y = ml_df[target]
+        X_emp = ml_df_emp[features_employment]
+        y_emp = ml_df_emp[target_employment]
         
-        # Train both models
-        rf_model, xgb_model, rf_acc, xgb_acc, X_test, y_test = train_models(X, y)
+        # Prepare data for Trust in AI
+        features_trust = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating', 'AI Knowledge']
+        target_trust = 'Trust in AI'
+        
+        ml_df_trust = df[features_trust + [target_trust]].dropna()
+        encoders_trust = {}
+        for col in ['Age Range', 'Gender', 'Education Level', 'AI Knowledge', target_trust]:
+            le = LabelEncoder()
+            ml_df_trust[col] = le.fit_transform(ml_df_trust[col].astype(str))
+            encoders_trust[col] = le
 
-        # Display Model Stats
-        col_stat1, col_stat2 = st.columns(2)
-        with col_stat1:
-            st.markdown(f"""
-                <div class='model-comparison'>
-                    <h3>🌲 Random Forest</h3>
-                    <h2 style='color: #10b981;'>{rf_acc*100:.2f}% Accuracy</h2>
-                    <p style='color: #94a3b8;'>Robust & Interpretable</p>
-                </div>
-            """, unsafe_allow_html=True)
+        X_trust = ml_df_trust[features_trust]
+        y_trust = ml_df_trust[target_trust]
         
-        with col_stat2:
-            st.markdown(f"""
-                <div class='model-comparison'>
-                    <h3>⚡ XGBoost</h3>
-                    <h2 style='color: #3b82f6;'>{xgb_acc*100:.2f}% Accuracy</h2>
-                    <p style='color: #94a3b8;'>High Performance</p>
-                </div>
-            """, unsafe_allow_html=True)
+        # Train models
+        rf_model_emp, xgb_model_emp, rf_acc_emp, xgb_acc_emp, _, _ = train_models(X_emp, y_emp, "employment")
+        rf_model_trust, xgb_model_trust, rf_acc_trust, xgb_acc_trust, _, _ = train_models(X_trust, y_trust, "trust")
+
+        # Display Model Stats based on selection
+        if "Both" in prediction_target:
+            st.markdown("### 📊 Model Performance Overview")
+            col_a, col_b = st.columns(2)
+            
+            with col_a:
+                st.markdown("#### 💼 Employment Status Model")
+                col_stat1, col_stat2 = st.columns(2)
+                with col_stat1:
+                    st.markdown(f"""
+                        <div class='model-comparison'>
+                            <h4>🌲 Random Forest</h4>
+                            <h3 style='color: #10b981;'>{rf_acc_emp*100:.2f}%</h3>
+                        </div>
+                    """, unsafe_allow_html=True)
+                with col_stat2:
+                    st.markdown(f"""
+                        <div class='model-comparison'>
+                            <h4>⚡ XGBoost</h4>
+                            <h3 style='color: #3b82f6;'>{xgb_acc_emp*100:.2f}%</h3>
+                        </div>
+                    """, unsafe_allow_html=True)
+            
+            with col_b:
+                st.markdown("#### 🤝 Trust in AI Model")
+                col_stat3, col_stat4 = st.columns(2)
+                with col_stat3:
+                    st.markdown(f"""
+                        <div class='model-comparison'>
+                            <h4>🌲 Random Forest</h4>
+                            <h3 style='color: #10b981;'>{rf_acc_trust*100:.2f}%</h3>
+                        </div>
+                    """, unsafe_allow_html=True)
+                with col_stat4:
+                    st.markdown(f"""
+                        <div class='model-comparison'>
+                            <h4>⚡ XGBoost</h4>
+                            <h3 style='color: #3b82f6;'>{xgb_acc_trust*100:.2f}%</h3>
+                        </div>
+                    """, unsafe_allow_html=True)
+        
+        elif "Employment" in prediction_target:
+            col_stat1, col_stat2 = st.columns(2)
+            with col_stat1:
+                st.markdown(f"""
+                    <div class='model-comparison'>
+                        <h3>🌲 Random Forest</h3>
+                        <h2 style='color: #10b981;'>{rf_acc_emp*100:.2f}% Accuracy</h2>
+                        <p style='color: #94a3b8;'>Employment Status Prediction</p>
+                    </div>
+                """, unsafe_allow_html=True)
+            
+            with col_stat2:
+                st.markdown(f"""
+                    <div class='model-comparison'>
+                        <h3>⚡ XGBoost</h3>
+                        <h2 style='color: #3b82f6;'>{xgb_acc_emp*100:.2f}% Accuracy</h2>
+                        <p style='color: #94a3b8;'>Employment Status Prediction</p>
+                    </div>
+                """, unsafe_allow_html=True)
+        
+        else:  # Trust only
+            col_stat1, col_stat2 = st.columns(2)
+            with col_stat1:
+                st.markdown(f"""
+                    <div class='model-comparison'>
+                        <h3>🌲 Random Forest</h3>
+                        <h2 style='color: #10b981;'>{rf_acc_trust*100:.2f}% Accuracy</h2>
+                        <p style='color: #94a3b8;'>Trust in AI Prediction</p>
+                    </div>
+                """, unsafe_allow_html=True)
+            
+            with col_stat2:
+                st.markdown(f"""
+                    <div class='model-comparison'>
+                        <h3>⚡ XGBoost</h3>
+                        <h2 style='color: #3b82f6;'>{xgb_acc_trust*100:.2f}% Accuracy</h2>
+                        <p style='color: #94a3b8;'>Trust in AI Prediction</p>
+                    </div>
+                """, unsafe_allow_html=True)
 
         st.divider()
 
+        # User Input Form
         with st.container():
             c_left, c_right = st.columns(2)
-            u_age = c_left.selectbox("🎂 Your Age Range", encoders['Age Range'].classes_)
-            u_gen = c_left.selectbox("👤 Your Gender", encoders['Gender'].classes_)
-            u_edu = c_right.selectbox("🎓 Education Level", encoders['Education Level'].classes_)
+            u_age = c_left.selectbox("🎂 Your Age Range", encoders_emp['Age Range'].classes_)
+            u_gen = c_left.selectbox("👤 Your Gender", encoders_emp['Gender'].classes_)
+            u_edu = c_right.selectbox("🎓 Education Level", encoders_emp['Education Level'].classes_)
             u_use = c_right.select_slider("📱 AI Usage Level", options=[1, 2, 3, 4, 5], value=3)
+            
+            # Only show AI Knowledge if predicting Trust
+            if "Trust" in prediction_target:
+                u_knowledge = st.selectbox("🧠 AI Knowledge Level", encoders_trust['AI Knowledge'].classes_)
 
             st.markdown("<br>", unsafe_allow_html=True)
             
-            if st.button("🚀 PREDICT MY STATUS"):
-                in_age = encoders['Age Range'].transform([u_age])[0]
-                in_gen = encoders['Gender'].transform([u_gen])[0]
-                in_edu = encoders['Education Level'].transform([u_edu])[0]
+            if st.button("🚀 PREDICT NOW"):
+                # Encode inputs
+                in_age_emp = encoders_emp['Age Range'].transform([u_age])[0]
+                in_gen_emp = encoders_emp['Gender'].transform([u_gen])[0]
+                in_edu_emp = encoders_emp['Education Level'].transform([u_edu])[0]
                 
-                # Choose model based on selection
-                if "Random Forest" in model_choice:
-                    res_num = rf_model.predict([[in_age, in_gen, in_edu, u_use]])
-                    model_name = "Random Forest"
-                    model_acc = rf_acc
-                else:
-                    res_num = xgb_model.predict([[in_age, in_gen, in_edu, u_use]])
-                    model_name = "XGBoost"
-                    model_acc = xgb_acc
+                if "Trust" in prediction_target:
+                    in_age_trust = encoders_trust['Age Range'].transform([u_age])[0]
+                    in_gen_trust = encoders_trust['Gender'].transform([u_gen])[0]
+                    in_edu_trust = encoders_trust['Education Level'].transform([u_edu])[0]
+                    in_knowledge = encoders_trust['AI Knowledge'].transform([u_knowledge])[0]
                 
-                final_res = encoders[target].inverse_transform(res_num)[0]
-                
-                st.balloons()
-                st.markdown(f"""
-                    <div class="prediction-card">
-                        <h1 style="color:#60a5fa; margin:0; font-size: 48px;">🎯 {final_res}</h1>
-                        <p style="color:#94a3b8; font-size:20px; margin: 20px 0;">Predicted Employment Status</p>
-                        <div style="background: #0f172a; padding: 20px; border-radius: 10px; margin-top: 20px;">
-                            <p style="color:#10b981; font-size:16px; margin:5px;">Model: <b>{model_name}</b></p>
-                            <p style="color:#3b82f6; font-size:16px; margin:5px;">Confidence: <b>{model_acc*100:.1f}%</b></p>
-                            <p style="color:#f59e0b; font-size:16px; margin:5px;">Training Samples: <b>{len(ml_df)}</b></p>
+                # Make predictions based on selection
+                if "Both" in prediction_target:
+                    # Predict both
+                    if "Random Forest" in model_choice:
+                        emp_pred = rf_model_emp.predict([[in_age_emp, in_gen_emp, in_edu_emp, u_use]])
+                        trust_pred = rf_model_trust.predict([[in_age_trust, in_gen_trust, in_edu_trust, u_use, in_knowledge]])
+                        model_name = "Random Forest"
+                        emp_acc = rf_acc_emp
+                        trust_acc = rf_acc_trust
+                    else:
+                        emp_pred = xgb_model_emp.predict([[in_age_emp, in_gen_emp, in_edu_emp, u_use]])
+                        trust_pred = xgb_model_trust.predict([[in_age_trust, in_gen_trust, in_edu_trust, u_use, in_knowledge]])
+                        model_name = "XGBoost"
+                        emp_acc = xgb_acc_emp
+                        trust_acc = xgb_acc_trust
+                    
+                    final_emp = encoders_emp[target_employment].inverse_transform(emp_pred)[0]
+                    final_trust = encoders_trust[target_trust].inverse_transform(trust_pred)[0]
+                    
+                    st.balloons()
+                    st.markdown(f"""
+                        <div class="dual-prediction">
+                            <h1 style="color: white; margin: 0; font-size: 42px;">🎯 Dual Prediction Results</h1>
+                            <br>
+                            <div style="display: flex; gap: 20px; justify-content: space-around; margin-top: 20px;">
+                                <div style="background: #0f172a; padding: 25px; border-radius: 15px; flex: 1;">
+                                    <h2 style="color: #60a5fa; margin: 0;">💼 Employment Status</h2>
+                                    <h1 style="color: #10b981; margin: 15px 0; font-size: 36px;">{final_emp}</h1>
+                                    <p style="color: #94a3b8;">Confidence: {emp_acc*100:.1f}%</p>
+                                </div>
+                                <div style="background: #0f172a; padding: 25px; border-radius: 15px; flex: 1;">
+                                    <h2 style="color: #60a5fa; margin: 0;">🤝 Trust Level</h2>
+                                    <h1 style="color: #f59e0b; margin: 15px 0; font-size: 36px;">{final_trust}</h1>
+                                    <p style="color: #94a3b8;">Confidence: {trust_acc*100:.1f}%</p>
+                                </div>
+                            </div>
+                            <br>
+                            <p style="color: white; font-size: 16px; margin-top: 20px;">Model: <b>{model_name}</b></p>
                         </div>
-                    </div>
-                """, unsafe_allow_html=True)
+                    """, unsafe_allow_html=True)
+                
+                elif "Employment" in prediction_target:
+                    # Predict Employment only
+                    if "Random Forest" in model_choice:
+                        emp_pred = rf_model_emp.predict([[in_age_emp, in_gen_emp, in_edu_emp, u_use]])
+                        model_name = "Random Forest"
+                        model_acc = rf_acc_emp
+                    else:
+                        emp_pred = xgb_model_emp.predict([[in_age_emp, in_gen_emp, in_edu_emp, u_use]])
+                        model_name = "XGBoost"
+                        model_acc = xgb_acc_emp
+                    
+                    final_emp = encoders_emp[target_employment].inverse_transform(emp_pred)[0]
+                    
+                    st.balloons()
+                    st.markdown(f"""
+                        <div class="prediction-card">
+                            <h1 style="color:#60a5fa; margin:0; font-size: 48px;">💼 {final_emp}</h1>
+                            <p style="color:#94a3b8; font-size:20px; margin: 20px 0;">Predicted Employment Status</p>
+                            <div style="background: #0f172a; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                                <p style="color:#10b981; font-size:16px; margin:5px;">Model: <b>{model_name}</b></p>
+                                <p style="color:#3b82f6; font-size:16px; margin:5px;">Confidence: <b>{model_acc*100:.1f}%</b></p>
+                                <p style="color:#f59e0b; font-size:16px; margin:5px;">Training Samples: <b>{len(ml_df_emp)}</b></p>
+                            </div>
+                        </div>
+                    """, unsafe_allow_html=True)
+                
+                else:  # Trust only
+                    # Predict Trust only
+                    if "Random Forest" in model_choice:
+                        trust_pred = rf_model_trust.predict([[in_age_trust, in_gen_trust, in_edu_trust, u_use, in_knowledge]])
+                        model_name = "Random Forest"
+                        model_acc = rf_acc_trust
+                    else:
+                        trust_pred = xgb_model_trust.predict([[in_age_trust, in_gen_trust, in_edu_trust, u_use, in_knowledge]])
+                        model_name = "XGBoost"
+                        model_acc = xgb_acc_trust
+                    
+                    final_trust = encoders_trust[target_trust].inverse_transform(trust_pred)[0]
+                    
+                    st.balloons()
+                    st.markdown(f"""
+                        <div class="prediction-card">
+                            <h1 style="color:#60a5fa; margin:0; font-size: 48px;">🤝 {final_trust}</h1>
+                            <p style="color:#94a3b8; font-size:20px; margin: 20px 0;">Predicted Trust in AI</p>
+                            <div style="background: #0f172a; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                                <p style="color:#10b981; font-size:16px; margin:5px;">Model: <b>{model_name}</b></p>
+                                <p style="color:#3b82f6; font-size:16px; margin:5px;">Confidence: <b>{model_acc*100:.1f}%</b></p>
+                                <p style="color:#f59e0b; font-size:16px; margin:5px;">Training Samples: <b>{len(ml_df_trust)}</b></p>
+                            </div>
+                        </div>
+                    """, unsafe_allow_html=True)
 
     else:  # Model Comparison
         st.markdown("<h1 style='text-align: center;'>⚡ Model Performance Comparison</h1>", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
 
-        features = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating']
-        target = 'Employment Status'
-        
-        ml_df = df[features + [target]].dropna()
-        encoders = {}
-        for col in ['Age Range', 'Gender', 'Education Level', target]:
-            le = LabelEncoder()
-            ml_df[col] = le.fit_transform(ml_df[col].astype(str))
-            encoders[col] = le
+        # Choose which target to compare
+        comparison_target = st.radio("**Compare models for:**", 
+                                     ["💼 Employment Status", "🤝 Trust in AI"],
+                                     horizontal=True)
 
-        X = ml_df[features]
-        y = ml_df[target]
-        
-        rf_model, xgb_model, rf_acc, xgb_acc, X_test, y_test = train_models(X, y)
+        if "Employment" in comparison_target:
+            features = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating']
+            target = 'Employment Status'
+            
+            ml_df = df[features + [target]].dropna()
+            encoders = {}
+            for col in ['Age Range', 'Gender', 'Education Level', target]:
+                le = LabelEncoder()
+                ml_df[col] = le.fit_transform(ml_df[col].astype(str))
+                encoders[col] = le
+
+            X = ml_df[features]
+            y = ml_df[target]
+            
+            rf_model, xgb_model, rf_acc, xgb_acc, X_test, y_test = train_models(X, y, "employment")
+    
+        else:  # Trust in AI
+            features = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating', 'AI Knowledge']
+            target = 'Trust in AI'
+            
+            ml_df = df[features + [target]].dropna()
+            encoders = {}
+            for col in ['Age Range', 'Gender', 'Education Level', 'AI Knowledge', target]:
+                le = LabelEncoder()
+                ml_df[col] = le.fit_transform(ml_df[col].astype(str))
+                encoders[col] = le
+
+            X = ml_df[features]
+            y = ml_df[target]
+            
+            rf_model, xgb_model, rf_acc, xgb_acc, X_test, y_test = train_models(X, y, "trust")
 
         # Comparison Metrics
         col1, col2 = st.columns(2)
@@ -448,7 +647,7 @@ if df is not None:
         col_imp1, col_imp2 = st.columns(2)
         
         with col_imp1:
-            # Random Forest Feature Importance - FIXED
+            # Random Forest Feature Importance
             rf_importance = pd.DataFrame({
                 'Feature': features,
                 'Importance': rf_model.feature_importances_
@@ -476,7 +675,7 @@ if df is not None:
             st.plotly_chart(fig_rf_imp, use_container_width=True)
         
         with col_imp2:
-            # XGBoost Feature Importance - FIXED
+            # XGBoost Feature Importance
             xgb_importance = pd.DataFrame({
                 'Feature': features,
                 'Importance': xgb_model.feature_importances_
@@ -537,6 +736,7 @@ if df is not None:
                 <p style='color: #e9d5ff; font-size: 24px; margin-top: 15px;'>
                     Achieved {winner_acc:.2f}% accuracy on test data
                 </p>
+                <p style='color: #e9d5ff; font-size: 18px;'>Predicting: {comparison_target}</p>
             </div>
         """, unsafe_allow_html=True)
 
