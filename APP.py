@@ -351,7 +351,7 @@ if df is not None:
         X_trust = ml_df_trust[features_trust]
         y_trust = ml_df_trust[target_trust]
         
-        # Train models
+        # Train models UNCONDITIONALLY so they are always available
         rf_model_emp, xgb_model_emp, rf_acc_emp, xgb_acc_emp, _, _ = train_models(X_emp, y_emp, "employment")
         rf_model_trust, xgb_model_trust, rf_acc_trust, xgb_acc_trust, _, _ = train_models(X_trust, y_trust, "trust")
 
@@ -446,8 +446,8 @@ if df is not None:
             u_edu = c_right.selectbox("🎓 Education Level", encoders_emp['Education Level'].classes_)
             u_use = c_right.select_slider("📱 AI Usage Level", options=[1, 2, 3, 4, 5], value=3)
             
-            # Only show AI Knowledge if predicting Trust
-            if "Trust" in prediction_target:
+            # Show AI Knowledge if predicting Trust OR Both
+            if "Trust" in prediction_target or "Both" in prediction_target:
                 u_knowledge = st.selectbox("🧠 AI Knowledge Level", encoders_trust['AI Knowledge'].classes_)
 
             st.markdown("<br>", unsafe_allow_html=True)
@@ -458,7 +458,8 @@ if df is not None:
                 in_gen_emp = encoders_emp['Gender'].transform([u_gen])[0]
                 in_edu_emp = encoders_emp['Education Level'].transform([u_edu])[0]
                 
-                if "Trust" in prediction_target:
+                # FIX: Check for Both here as well so variables are defined
+                if "Trust" in prediction_target or "Both" in prediction_target:
                     in_age_trust = encoders_trust['Age Range'].transform([u_age])[0]
                     in_gen_trust = encoders_trust['Gender'].transform([u_gen])[0]
                     in_edu_trust = encoders_trust['Education Level'].transform([u_edu])[0]
@@ -556,7 +557,6 @@ if df is not None:
                             </div>
                         </div>
                     """, unsafe_allow_html=True)
-
     else:  # Model Comparison
         st.markdown("<h1 style='text-align: center;'>⚡ Model Performance Comparison</h1>", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
@@ -742,3 +742,4 @@ if df is not None:
 
 else:
     st.error("❌ Data file not found. Please ensure the CSV is uploaded correctly.")
+
