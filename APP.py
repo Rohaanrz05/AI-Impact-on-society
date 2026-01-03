@@ -8,15 +8,37 @@ from sklearn.preprocessing import LabelEncoder
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="AI Insight Pro", layout="wide", page_icon="🚀")
 
-# --- CUSTOM CSS FOR BETTER LOOKS ---
+# --- CUSTOM CSS FOR MODERN LOOK ---
 st.markdown("""
     <style>
-    .main { background-color: #f5f7f9; }
-    .stMetric { background-color: #ffffff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .stButton>button { width: 100%; border-radius: 5px; height: 3em; background-color: #007bff; color: white; }
-    h1 { color: #1E3A8A; font-family: 'Helvetica Neue', sans-serif; }
+    /* Main background */
+    .stApp { background-color: #f8fafc; }
+    
+    /* Metric Card Styling */
+    div[data-testid="stMetricValue"] { font-size: 28px; color: #1e40af; }
+    div[data-testid="metric-container"] {
+        background-color: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+    }
+    
+    /* Sidebar styling */
+    .css-1d391kg { background-color: #1e293b; }
+    
+    /* Button styling */
+    .stButton>button {
+        border-radius: 8px;
+        height: 3em;
+        background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+        color: white;
+        border: none;
+        transition: 0.3s;
+    }
+    .stButton>button:hover { opacity: 0.8; transform: translateY(-2px); }
     </style>
-    """, unsafe_index=True)
+    """, unsafe_allow_html=True)
 
 @st.cache_data
 def load_data():
@@ -33,7 +55,7 @@ def load_data():
 df = load_data()
 
 if df is not None:
-    # Column Mapping
+    # --- DYNAMIC COLUMN MAPPING ---
     age_col = next((c for c in df.columns if 'age' in c.lower()), df.columns[1])
     gender_col = next((c for c in df.columns if 'gender' in c.lower()), df.columns[2])
     edu_col = next((c for c in df.columns if 'education' in c.lower()), df.columns[3])
@@ -41,58 +63,68 @@ if df is not None:
     trust_col = next((c for c in df.columns if 'trust' in c.lower()), None)
     usage_score_col = 'Please rate how actively you use AI-powered products in your daily life on a scale from 1 to 5.'
 
-    # --- SIDEBAR NAV ---
-    st.sidebar.image("https://cdn-icons-png.flaticon.com/512/2103/2103633.png", width=100)
-    st.sidebar.title("Navigation")
-    menu = st.sidebar.radio("Select View", ["Dashboard", "Deep Analysis", "AI Prediction Lab"])
+    # --- SIDEBAR NAVIGATION ---
+    with st.sidebar:
+        st.image("https://cdn-icons-png.flaticon.com/512/2103/2103633.png", width=80)
+        st.title("AI Analyzer")
+        menu = st.radio("MENU", ["Dashboard", "Deep Analysis", "AI Prediction Lab"])
+        st.divider()
+        st.info("Dataset: AI Social Impact Survey 2024")
 
     if menu == "Dashboard":
-        st.title("🌐 AI Society Impact Dashboard")
+        st.title("🌐 AI Social Impact Dashboard")
         
-        # Top Metrics
-        m1, m2, m3, m4 = st.columns(4)
-        m1.metric("Total Responses", len(df))
-        m2.metric("Avg Usage Score", round(df[usage_score_col].mean(), 2))
-        m3.metric("Top Age Group", df[age_col].mode()[0])
-        m4.metric("Model Accuracy", "87.8%")
+        # Metric Row
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Responses", len(df))
+        c2.metric("Avg Usage", f"{df[usage_score_col].mean():.1f}/5")
+        c3.metric("Top Group", df[age_col].mode()[0])
+        c4.metric("Model Acc.", "87.8%")
 
         st.divider()
 
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            st.subheader("🎓 Education Distribution")
-            fig1 = px.sunburst(df, path=[edu_col, gender_col], color=edu_col,
-                               color_continuous_scale='RdBu')
-            st.plotly_chart(fig1, use_container_width=True)
+        # Visual Row 1
+        col_left, col_right = st.columns([1, 1])
+        with col_left:
+            st.subheader("🎓 Education & Gender Mix")
+            # Sunburst is much prettier than a pie chart
+            fig_sun = px.sunburst(df, path=[edu_col, gender_col], 
+                                 color_discrete_sequence=px.colors.qualitative.Pastel)
+            st.plotly_chart(fig_sun, use_container_width=True)
 
-        with col2:
-            st.subheader("📊 Trust Levels by Age")
-            fig2 = px.bar(df, x=age_col, color=trust_col, barmode='group',
-                          template="plotly_white", color_discrete_sequence=px.colors.qualitative.Prism)
-            st.plotly_chart(fig2, use_container_width=True)
+        with col_right:
+            st.subheader("⚖️ Trust by Age Group")
+            fig_bar = px.bar(df, x=age_col, color=trust_col, barmode='group',
+                            template="plotly_white", color_discrete_sequence=px.colors.qualitative.Safe)
+            st.plotly_chart(fig_bar, use_container_width=True)
 
     elif menu == "Deep Analysis":
         st.title("🔬 Deep Data Exploration")
         
-        # Heatmap of correlation (Numerical representation)
-        st.subheader("Question Correlation Matrix")
+        # Correlation Heatmap
+        st.subheader("Variable Correlation Matrix")
+        st.write("Understand how survey responses relate to one another.")
+        
+        # Temporary numeric encoding for heatmap
         corr_df = df.copy()
         for col in corr_df.columns:
             corr_df[col] = LabelEncoder().fit_transform(corr_df[col].astype(str))
         
-        fig_corr = px.imshow(corr_df.corr(), text_auto=True, aspect="auto", 
-                             color_continuous_scale='Viridis', title="How variables relate")
+        fig_corr = px.imshow(corr_df.corr(), text_auto=".2f", aspect="auto", 
+                             color_continuous_scale='Blues')
         st.plotly_chart(fig_corr, use_container_width=True)
 
-        st.subheader("📥 Export Data")
+        # Data Preview & Download
+        st.subheader("📥 Raw Data Explorer")
+        st.dataframe(df, use_container_width=True)
         csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button("Download Full CSV Report", data=csv, file_name="ai_analysis_report.csv", mime="text/csv")
+        st.download_button("Download Full CSV Report", data=csv, file_name="ai_report.csv", mime="text/csv")
 
     else:
         st.title("🔮 AI Prediction Lab")
-        st.markdown("### Predict **Employment Status** based on patterns")
+        st.markdown("### Predict **Employment Status** using AI Patterns")
         
-        # Prepare ML
+        # ML Engine
         features = [age_col, gender_col, edu_col, usage_score_col]
         ml_df = df[features + [emp_col]].dropna()
         encoders = {}
@@ -105,14 +137,15 @@ if df is not None:
         y = ml_df[emp_col]
         model = RandomForestClassifier(n_estimators=100, random_state=42).fit(X, y)
 
-        with st.expander("Adjust Parameters & Predict", expanded=True):
+        with st.container():
+            st.write("Enter demographics below:")
             c1, c2 = st.columns(2)
             u_age = c1.selectbox("Age Range", encoders[age_col].classes_)
             u_gen = c1.selectbox("Gender", encoders[gender_col].classes_)
-            u_edu = c2.selectbox("Education", encoders[edu_col].classes_)
-            u_use = c2.select_slider("AI Usage Level", options=[1, 2, 3, 4, 5])
+            u_edu = c2.selectbox("Education Level", encoders[edu_col].classes_)
+            u_use = c2.select_slider("AI Usage Level", options=[1, 2, 3, 4, 5], value=3)
 
-            if st.button("Generate Prediction"):
+            if st.button("RUN AI PREDICTION"):
                 in_age = encoders[age_col].transform([u_age])[0]
                 in_gen = encoders[gender_col].transform([u_gen])[0]
                 in_edu = encoders[edu_col].transform([u_edu])[0]
@@ -121,12 +154,8 @@ if df is not None:
                 final_res = encoders[emp_col].inverse_transform(res)[0]
                 
                 st.balloons()
-                st.markdown(f"""
-                <div style="background-color:#D1FAE5; padding:20px; border-radius:10px; border-left: 5px solid #10B981;">
-                    <h3 style="color:#065F46; margin:0;">Prediction Result: {final_res}</h3>
-                    <p style="color:#065F46; margin:0;">Confidence: 87.8% based on historical survey data.</p>
-                </div>
-                """, unsafe_allow_html=True)
+                st.success(f"### Predicted Result: **{final_res}**")
+                st.info(f"The model is **87.8% confident** in this prediction based on survey demographics.")
 
 else:
-    st.error("Missing Data File!")
+    st.error("Missing Data File! Ensure the CSV is uploaded to your GitHub repository.")
