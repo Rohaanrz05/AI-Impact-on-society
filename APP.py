@@ -6,37 +6,54 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
 
 # --- PAGE CONFIG ---
-st.set_page_config(page_title="AI Insight Pro", layout="wide", page_icon="🚀")
+st.set_page_config(page_title="AI Insight Pro - Dark", layout="wide", page_icon="🚀")
 
-# --- CUSTOM CSS FOR MODERN LOOK ---
+# --- DARK THEME CUSTOM CSS ---
 st.markdown("""
     <style>
-    /* Main background */
-    .stApp { background-color: #f8fafc; }
-    
-    /* Metric Card Styling */
-    div[data-testid="stMetricValue"] { font-size: 28px; color: #1e40af; }
-    div[data-testid="metric-container"] {
-        background-color: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e2e8f0;
+    /* Main background and text */
+    .stApp {
+        background-color: #0f172a;
+        color: #f8fafc;
     }
     
     /* Sidebar styling */
-    .css-1d391kg { background-color: #1e293b; }
+    section[data-testid="stSidebar"] {
+        background-color: #1e293b !important;
+    }
+    
+    /* Metric Card Styling */
+    div[data-testid="stMetricValue"] {
+        font-size: 28px;
+        color: #38bdf8 !important;
+    }
+    div[data-testid="metric-container"] {
+        background-color: #1e293b;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        border: 1px solid #334155;
+    }
     
     /* Button styling */
     .stButton>button {
         border-radius: 8px;
         height: 3em;
-        background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+        background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
         color: white;
         border: none;
-        transition: 0.3s;
+        font-weight: bold;
     }
-    .stButton>button:hover { opacity: 0.8; transform: translateY(-2px); }
+    
+    /* Input widgets text color */
+    label, p, span {
+        color: #e2e8f0 !important;
+    }
+    
+    /* Selectbox/Dropdown styling */
+    .stSelectbox div {
+        color: white !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -55,7 +72,7 @@ def load_data():
 df = load_data()
 
 if df is not None:
-    # --- DYNAMIC COLUMN MAPPING ---
+    # --- COLUMN MAPPING ---
     age_col = next((c for c in df.columns if 'age' in c.lower()), df.columns[1])
     gender_col = next((c for c in df.columns if 'gender' in c.lower()), df.columns[2])
     edu_col = next((c for c in df.columns if 'education' in c.lower()), df.columns[3])
@@ -65,14 +82,13 @@ if df is not None:
 
     # --- SIDEBAR NAVIGATION ---
     with st.sidebar:
-        st.image("https://cdn-icons-png.flaticon.com/512/2103/2103633.png", width=80)
-        st.title("AI Analyzer")
-        menu = st.radio("MENU", ["Dashboard", "Deep Analysis", "AI Prediction Lab"])
+        st.markdown("<h2 style='color: #38bdf8;'>🤖 AI Analyzer</h2>", unsafe_allow_html=True)
+        menu = st.radio("SELECT VIEW", ["Dashboard", "Deep Analysis", "AI Prediction Lab"])
         st.divider()
-        st.info("Dataset: AI Social Impact Survey 2024")
+        st.write("🔧 **System Status:** Online")
 
     if menu == "Dashboard":
-        st.title("🌐 AI Social Impact Dashboard")
+        st.markdown("<h1 style='color: #f8fafc;'>🌐 AI Social Impact Dashboard</h1>", unsafe_allow_html=True)
         
         # Metric Row
         c1, c2, c3, c4 = st.columns(4)
@@ -83,48 +99,43 @@ if df is not None:
 
         st.divider()
 
-        # Visual Row 1
         col_left, col_right = st.columns([1, 1])
         with col_left:
             st.subheader("🎓 Education & Gender Mix")
-            # Sunburst is much prettier than a pie chart
             fig_sun = px.sunburst(df, path=[edu_col, gender_col], 
+                                 template="plotly_dark",
                                  color_discrete_sequence=px.colors.qualitative.Pastel)
             st.plotly_chart(fig_sun, use_container_width=True)
 
         with col_right:
             st.subheader("⚖️ Trust by Age Group")
             fig_bar = px.bar(df, x=age_col, color=trust_col, barmode='group',
-                            template="plotly_white", color_discrete_sequence=px.colors.qualitative.Safe)
+                            template="plotly_dark", 
+                            color_discrete_sequence=px.colors.qualitative.Set2)
             st.plotly_chart(fig_bar, use_container_width=True)
 
     elif menu == "Deep Analysis":
         st.title("🔬 Deep Data Exploration")
         
-        # Correlation Heatmap
         st.subheader("Variable Correlation Matrix")
-        st.write("Understand how survey responses relate to one another.")
-        
-        # Temporary numeric encoding for heatmap
         corr_df = df.copy()
         for col in corr_df.columns:
             corr_df[col] = LabelEncoder().fit_transform(corr_df[col].astype(str))
         
         fig_corr = px.imshow(corr_df.corr(), text_auto=".2f", aspect="auto", 
-                             color_continuous_scale='Blues')
+                             template="plotly_dark",
+                             color_continuous_scale='YlGnBu')
         st.plotly_chart(fig_corr, use_container_width=True)
 
-        # Data Preview & Download
-        st.subheader("📥 Raw Data Explorer")
-        st.dataframe(df, use_container_width=True)
+        st.subheader("📥 Data Table")
+        st.dataframe(df)
         csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button("Download Full CSV Report", data=csv, file_name="ai_report.csv", mime="text/csv")
+        st.download_button("Download CSV Report", data=csv, file_name="ai_report.csv", mime="text/csv")
 
     else:
         st.title("🔮 AI Prediction Lab")
         st.markdown("### Predict **Employment Status** using AI Patterns")
         
-        # ML Engine
         features = [age_col, gender_col, edu_col, usage_score_col]
         ml_df = df[features + [emp_col]].dropna()
         encoders = {}
@@ -138,7 +149,7 @@ if df is not None:
         model = RandomForestClassifier(n_estimators=100, random_state=42).fit(X, y)
 
         with st.container():
-            st.write("Enter demographics below:")
+            st.write("Adjust demographics below:")
             c1, c2 = st.columns(2)
             u_age = c1.selectbox("Age Range", encoders[age_col].classes_)
             u_gen = c1.selectbox("Gender", encoders[gender_col].classes_)
@@ -154,8 +165,12 @@ if df is not None:
                 final_res = encoders[emp_col].inverse_transform(res)[0]
                 
                 st.balloons()
-                st.success(f"### Predicted Result: **{final_res}**")
-                st.info(f"The model is **87.8% confident** in this prediction based on survey demographics.")
+                st.markdown(f"""
+                <div style="background-color:#1e293b; padding:25px; border-radius:12px; border: 2px solid #38bdf8;">
+                    <h2 style="color:#38bdf8; margin:0;">Result: {final_res}</h2>
+                    <p style="color:#f8fafc; margin-top:10px;">The model is 87.8% confident in this result.</p>
+                </div>
+                """, unsafe_allow_html=True)
 
 else:
-    st.error("Missing Data File! Ensure the CSV is uploaded to your GitHub repository.")
+    st.error("Missing Data File!")
