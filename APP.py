@@ -5,8 +5,33 @@ import plotly.express as px
 # Set page config
 st.set_page_config(page_title="AI & Society Dashboard", layout="wide")
 
+# Load data with multiple encoding attempts
+@st.cache_data
+def load_data():
+    encodings = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252', 'windows-1252']
+    
+    for encoding in encodings:
+        try:
+            df = pd.read_csv('The impact of artificial intelligence on society.csv', 
+                           encoding=encoding, 
+                           encoding_errors='ignore')
+            return df
+        except (UnicodeDecodeError, LookupError):
+            continue
+        except Exception as e:
+            st.error(f"Error loading file: {str(e)}")
+            return None
+    
+    st.error("Could not read the CSV file with any encoding")
+    return None
+
 # Load data
-df = pd.read_csv('The impact of artificial intelligence on society.csv', encoding='cp1252')
+df = load_data()
+
+# Check if data loaded successfully
+if df is None:
+    st.error("Failed to load data. Please check your CSV file.")
+    st.stop()
 
 # --- SIDEBAR FILTERS ---
 st.sidebar.header("Filter Results")
@@ -59,5 +84,4 @@ with tabs[1]:
         
         if submit:
             # This is where your ML model .predict() would go
-
             st.success(f"Based on your profile, your predicted AI Usage Score is: 4.2 / 5")
