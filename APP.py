@@ -109,7 +109,6 @@ st.markdown("""
 
 @st.cache_data
 def load_and_clean_data():
-    # UPDATED: Pointing to your cleaned file
     file_path = 'cleaned_ai_impact_data_updated.csv'
     encodings = ['utf-8', 'ISO-8859-1', 'cp1252', 'latin1']
     df = None
@@ -121,13 +120,9 @@ def load_and_clean_data():
             continue
     
     if df is not None:
-        # Strip whitespace from column names just in case
         df.columns = df.columns.str.strip()
-        
-        # Strip whitespace from all string columns to ensure 'Yes ' becomes 'Yes'
         for col in df.select_dtypes(include=['object']).columns:
             df[col] = df[col].astype(str).str.strip()
-            
         if 'ID' in df.columns:
             df.drop('ID', axis=1, inplace=True)
     return df
@@ -145,6 +140,7 @@ def train_models(X, y, model_type="employment"):
     
     # XGBoost
     xgb_model = XGBClassifier(n_estimators=150, max_depth=6, learning_rate=0.1, random_state=42, eval_metric='logloss')
+    # LabelEncoder transforms classes to 0,1,2..., which XGBoost handles natively
     xgb_model.fit(X_train, y_train)
     xgb_pred = xgb_model.predict(X_test)
     xgb_accuracy = accuracy_score(y_test, xgb_pred)
@@ -319,7 +315,8 @@ if df is not None:
 
         st.divider()
 
-        # Prepare data for Employment Status
+        # --- MODEL TRAINING ---
+        # 1. Employment Model Setup
         features_employment = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating']
         target_employment = 'Employment Status'
         
@@ -333,7 +330,7 @@ if df is not None:
         X_emp = ml_df_emp[features_employment]
         y_emp = ml_df_emp[target_employment]
         
-        # Prepare data for Trust in AI
+        # 2. Trust Model Setup
         features_trust = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating', 'AI Knowledge']
         target_trust = 'Trust in AI'
         
@@ -347,11 +344,16 @@ if df is not None:
         X_trust = ml_df_trust[features_trust]
         y_trust = ml_df_trust[target_trust]
         
-        # Train models UNCONDITIONALLY so they exist regardless of user selection
-        rf_model_emp, xgb_model_emp, rf_acc_emp, xgb_acc_emp, _, _ = train_models(X_emp, y_emp, "employment")
-        rf_model_trust, xgb_model_trust, rf_acc_trust, xgb_acc_trust, _, _ = train_models(X_trust, y_trust, "trust")
+        # 3. Train models conditionally or unconditionally
+        # To avoid NameErrors, we can just ensure models are ready if selected
+        
+        if "Employment" in prediction_target or "Both" in prediction_target:
+            rf_model_emp, xgb_model_emp, rf_acc_emp, xgb_acc_emp, _, _ = train_models(X_emp, y_emp, "employment")
 
-        # Display Model Stats based on selection
+        if "Trust" in prediction_target or "Both" in prediction_target:
+            rf_model_trust, xgb_model_trust, rf_acc_trust, xgb_acc_trust, _, _ = train_models(X_trust, y_trust, "trust")
+
+        # --- DISPLAY MODEL STATS ---
         if "Both" in prediction_target:
             st.markdown("### 📊 Model Performance Overview")
             col_a, col_b = st.columns(2)
@@ -360,195 +362,141 @@ if df is not None:
                 st.markdown("#### 💼 Employment Status Model")
                 col_stat1, col_stat2 = st.columns(2)
                 with col_stat1:
-                    st.markdown(f"""
-                        <div class='model-comparison'>
-                            <h4>🌲 Random Forest</h4>
-                            <h3 style='color: #10b981;'>{rf_acc_emp*100:.2f}%</h3>
-                        </div>
-                    """, unsafe_allow_html=True)
+                    st.markdown(f"<div class='model-comparison'><h4>🌲 Random Forest</h4><h3 style='color: #10b981;'>{rf_acc_emp*100:.2f}%</h3></div>", unsafe_allow_html=True)
                 with col_stat2:
-                    st.markdown(f"""
-                        <div class='model-comparison'>
-                            <h4>⚡ XGBoost</h4>
-                            <h3 style='color: #3b82f6;'>{xgb_acc_emp*100:.2f}%</h3>
-                        </div>
-                    """, unsafe_allow_html=True)
+                    st.markdown(f"<div class='model-comparison'><h4>⚡ XGBoost</h4><h3 style='color: #3b82f6;'>{xgb_acc_emp*100:.2f}%</h3></div>", unsafe_allow_html=True)
             
             with col_b:
                 st.markdown("#### 🤝 Trust in AI Model")
                 col_stat3, col_stat4 = st.columns(2)
                 with col_stat3:
-                    st.markdown(f"""
-                        <div class='model-comparison'>
-                            <h4>🌲 Random Forest</h4>
-                            <h3 style='color: #10b981;'>{rf_acc_trust*100:.2f}%</h3>
-                        </div>
-                    """, unsafe_allow_html=True)
+                    st.markdown(f"<div class='model-comparison'><h4>🌲 Random Forest</h4><h3 style='color: #10b981;'>{rf_acc_trust*100:.2f}%</h3></div>", unsafe_allow_html=True)
                 with col_stat4:
-                    st.markdown(f"""
-                        <div class='model-comparison'>
-                            <h4>⚡ XGBoost</h4>
-                            <h3 style='color: #3b82f6;'>{xgb_acc_trust*100:.2f}%</h3>
-                        </div>
-                    """, unsafe_allow_html=True)
+                    st.markdown(f"<div class='model-comparison'><h4>⚡ XGBoost</h4><h3 style='color: #3b82f6;'>{xgb_acc_trust*100:.2f}%</h3></div>", unsafe_allow_html=True)
         
         elif "Employment" in prediction_target:
             col_stat1, col_stat2 = st.columns(2)
             with col_stat1:
-                st.markdown(f"""
-                    <div class='model-comparison'>
-                        <h3>🌲 Random Forest</h3>
-                        <h2 style='color: #10b981;'>{rf_acc_emp*100:.2f}% Accuracy</h2>
-                        <p style='color: #94a3b8;'>Employment Status Prediction</p>
-                    </div>
-                """, unsafe_allow_html=True)
-            
+                st.markdown(f"<div class='model-comparison'><h3>🌲 Random Forest</h3><h2 style='color: #10b981;'>{rf_acc_emp*100:.2f}% Accuracy</h2><p style='color: #94a3b8;'>Employment Status Prediction</p></div>", unsafe_allow_html=True)
             with col_stat2:
-                st.markdown(f"""
-                    <div class='model-comparison'>
-                        <h3>⚡ XGBoost</h3>
-                        <h2 style='color: #3b82f6;'>{xgb_acc_emp*100:.2f}% Accuracy</h2>
-                        <p style='color: #94a3b8;'>Employment Status Prediction</p>
-                    </div>
-                """, unsafe_allow_html=True)
+                st.markdown(f"<div class='model-comparison'><h3>⚡ XGBoost</h3><h2 style='color: #3b82f6;'>{xgb_acc_emp*100:.2f}% Accuracy</h2><p style='color: #94a3b8;'>Employment Status Prediction</p></div>", unsafe_allow_html=True)
         
         else:  # Trust only
             col_stat1, col_stat2 = st.columns(2)
             with col_stat1:
-                st.markdown(f"""
-                    <div class='model-comparison'>
-                        <h3>🌲 Random Forest</h3>
-                        <h2 style='color: #10b981;'>{rf_acc_trust*100:.2f}% Accuracy</h2>
-                        <p style='color: #94a3b8;'>Trust in AI Prediction</p>
-                    </div>
-                """, unsafe_allow_html=True)
-            
+                st.markdown(f"<div class='model-comparison'><h3>🌲 Random Forest</h3><h2 style='color: #10b981;'>{rf_acc_trust*100:.2f}% Accuracy</h2><p style='color: #94a3b8;'>Trust in AI Prediction</p></div>", unsafe_allow_html=True)
             with col_stat2:
-                st.markdown(f"""
-                    <div class='model-comparison'>
-                        <h3>⚡ XGBoost</h3>
-                        <h2 style='color: #3b82f6;'>{xgb_acc_trust*100:.2f}% Accuracy</h2>
-                        <p style='color: #94a3b8;'>Trust in AI Prediction</p>
-                    </div>
-                """, unsafe_allow_html=True)
+                st.markdown(f"<div class='model-comparison'><h3>⚡ XGBoost</h3><h2 style='color: #3b82f6;'>{xgb_acc_trust*100:.2f}% Accuracy</h2><p style='color: #94a3b8;'>Trust in AI Prediction</p></div>", unsafe_allow_html=True)
 
         st.divider()
 
-        # User Input Form
+        # --- USER INPUT FORM ---
+        # Logic Fix: Determine which encoder dictionary to use for the Dropdown Options
+        # If predicting Trust Only, encoders_emp might not be relevant for UI if we used conditional logic above.
+        # But since we defined both encoders_emp and encoders_trust at the start of this block, we are safe.
+        # However, to be precise, we use the encoder matching the target.
+        
+        if "Employment" in prediction_target or "Both" in prediction_target:
+            ui_encoders = encoders_emp
+        else:
+            ui_encoders = encoders_trust
+
         with st.container():
             c_left, c_right = st.columns(2)
-            u_age = c_left.selectbox("🎂 Your Age Range", encoders_emp['Age Range'].classes_)
-            u_gen = c_left.selectbox("👤 Your Gender", encoders_emp['Gender'].classes_)
-            u_edu = c_right.selectbox("🎓 Education Level", encoders_emp['Education Level'].classes_)
+            u_age = c_left.selectbox("🎂 Your Age Range", ui_encoders['Age Range'].classes_)
+            u_gen = c_left.selectbox("👤 Your Gender", ui_encoders['Gender'].classes_)
+            u_edu = c_right.selectbox("🎓 Education Level", ui_encoders['Education Level'].classes_)
             u_use = c_right.select_slider("📱 AI Usage Level", options=[1, 2, 3, 4, 5], value=3)
             
             # Only show AI Knowledge if predicting Trust OR Both
+            u_knowledge = None
             if "Trust" in prediction_target or "Both" in prediction_target:
+                # Note: 'AI Knowledge' exists in encoders_trust
                 u_knowledge = st.selectbox("🧠 AI Knowledge Level", encoders_trust['AI Knowledge'].classes_)
 
             st.markdown("<br>", unsafe_allow_html=True)
             
             if st.button("🚀 PREDICT NOW"):
-                # Encode inputs
-                in_age_emp = encoders_emp['Age Range'].transform([u_age])[0]
-                in_gen_emp = encoders_emp['Gender'].transform([u_gen])[0]
-                in_edu_emp = encoders_emp['Education Level'].transform([u_edu])[0]
-                
+                # --- EMPLOYMENT PREDICTION ---
+                if "Employment" in prediction_target or "Both" in prediction_target:
+                    # Encode inputs using encoders_emp
+                    in_age_emp = encoders_emp['Age Range'].transform([u_age])[0]
+                    in_gen_emp = encoders_emp['Gender'].transform([u_gen])[0]
+                    in_edu_emp = encoders_emp['Education Level'].transform([u_edu])[0]
+                    
+                    if "Random Forest" in model_choice:
+                        emp_pred = rf_model_emp.predict([[in_age_emp, in_gen_emp, in_edu_emp, u_use]])
+                        emp_conf = rf_acc_emp
+                        model_name_emp = "Random Forest"
+                    else:
+                        emp_pred = xgb_model_emp.predict([[in_age_emp, in_gen_emp, in_edu_emp, u_use]])
+                        emp_conf = xgb_acc_emp
+                        model_name_emp = "XGBoost"
+                        
+                    final_emp = encoders_emp[target_employment].inverse_transform(emp_pred)[0]
+
+                # --- TRUST PREDICTION ---
                 if "Trust" in prediction_target or "Both" in prediction_target:
+                    # Encode inputs using encoders_trust
                     in_age_trust = encoders_trust['Age Range'].transform([u_age])[0]
                     in_gen_trust = encoders_trust['Gender'].transform([u_gen])[0]
                     in_edu_trust = encoders_trust['Education Level'].transform([u_edu])[0]
-                    in_knowledge = encoders_trust['AI Knowledge'].transform([u_knowledge])[0]
-                
-                # Make predictions based on selection
-                if "Both" in prediction_target:
-                    # Predict both
+                    in_know_trust = encoders_trust['AI Knowledge'].transform([u_knowledge])[0]
+                    
                     if "Random Forest" in model_choice:
-                        emp_pred = rf_model_emp.predict([[in_age_emp, in_gen_emp, in_edu_emp, u_use]])
-                        trust_pred = rf_model_trust.predict([[in_age_trust, in_gen_trust, in_edu_trust, u_use, in_knowledge]])
-                        model_name = "Random Forest"
-                        emp_acc = rf_acc_emp
-                        trust_acc = rf_acc_trust
+                        trust_pred = rf_model_trust.predict([[in_age_trust, in_gen_trust, in_edu_trust, u_use, in_know_trust]])
+                        trust_conf = rf_acc_trust
+                        model_name_trust = "Random Forest"
                     else:
-                        emp_pred = xgb_model_emp.predict([[in_age_emp, in_gen_emp, in_edu_emp, u_use]])
-                        trust_pred = xgb_model_trust.predict([[in_age_trust, in_gen_trust, in_edu_trust, u_use, in_knowledge]])
-                        model_name = "XGBoost"
-                        emp_acc = xgb_acc_emp
-                        trust_acc = xgb_acc_trust
-                    
-                    final_emp = encoders_emp[target_employment].inverse_transform(emp_pred)[0]
+                        trust_pred = xgb_model_trust.predict([[in_age_trust, in_gen_trust, in_edu_trust, u_use, in_know_trust]])
+                        trust_conf = xgb_acc_trust
+                        model_name_trust = "XGBoost"
+
                     final_trust = encoders_trust[target_trust].inverse_transform(trust_pred)[0]
-                    
-                    st.balloons()
+                
+                # --- DISPLAY RESULTS ---
+                st.balloons()
+                
+                if "Both" in prediction_target:
                     st.markdown(f"""
                         <div class="dual-prediction">
                             <h1 style="color: white; margin: 0; font-size: 42px;">🎯 Dual Prediction Results</h1>
                             <br>
                             <div style="display: flex; gap: 20px; justify-content: space-around; margin-top: 20px;">
                                 <div style="background: #0f172a; padding: 25px; border-radius: 15px; flex: 1;">
-                                    <h2 style="color: #60a5fa; margin: 0;">💼 Employment Status</h2>
+                                    <h2 style="color: #60a5fa; margin: 0;">💼 Employment</h2>
                                     <h1 style="color: #10b981; margin: 15px 0; font-size: 36px;">{final_emp}</h1>
-                                    <p style="color: #94a3b8;">Confidence: {emp_acc*100:.1f}%</p>
+                                    <p style="color: #94a3b8;">Confidence: {emp_conf*100:.1f}%</p>
                                 </div>
                                 <div style="background: #0f172a; padding: 25px; border-radius: 15px; flex: 1;">
                                     <h2 style="color: #60a5fa; margin: 0;">🤝 Trust Level</h2>
                                     <h1 style="color: #f59e0b; margin: 15px 0; font-size: 36px;">{final_trust}</h1>
-                                    <p style="color: #94a3b8;">Confidence: {trust_acc*100:.1f}%</p>
+                                    <p style="color: #94a3b8;">Confidence: {trust_conf*100:.1f}%</p>
                                 </div>
                             </div>
-                            <br>
-                            <p style="color: white; font-size: 16px; margin-top: 20px;">Model: <b>{model_name}</b></p>
                         </div>
                     """, unsafe_allow_html=True)
                 
                 elif "Employment" in prediction_target:
-                    # Predict Employment only
-                    if "Random Forest" in model_choice:
-                        emp_pred = rf_model_emp.predict([[in_age_emp, in_gen_emp, in_edu_emp, u_use]])
-                        model_name = "Random Forest"
-                        model_acc = rf_acc_emp
-                    else:
-                        emp_pred = xgb_model_emp.predict([[in_age_emp, in_gen_emp, in_edu_emp, u_use]])
-                        model_name = "XGBoost"
-                        model_acc = xgb_acc_emp
-                    
-                    final_emp = encoders_emp[target_employment].inverse_transform(emp_pred)[0]
-                    
-                    st.balloons()
                     st.markdown(f"""
                         <div class="prediction-card">
                             <h1 style="color:#60a5fa; margin:0; font-size: 48px;">💼 {final_emp}</h1>
                             <p style="color:#94a3b8; font-size:20px; margin: 20px 0;">Predicted Employment Status</p>
                             <div style="background: #0f172a; padding: 20px; border-radius: 10px; margin-top: 20px;">
-                                <p style="color:#10b981; font-size:16px; margin:5px;">Model: <b>{model_name}</b></p>
-                                <p style="color:#3b82f6; font-size:16px; margin:5px;">Confidence: <b>{model_acc*100:.1f}%</b></p>
-                                <p style="color:#f59e0b; font-size:16px; margin:5px;">Training Samples: <b>{len(ml_df_emp)}</b></p>
+                                <p style="color:#10b981; font-size:16px; margin:5px;">Model: <b>{model_name_emp}</b></p>
+                                <p style="color:#3b82f6; font-size:16px; margin:5px;">Confidence: <b>{emp_conf*100:.1f}%</b></p>
                             </div>
                         </div>
                     """, unsafe_allow_html=True)
                 
-                else:  # Trust only
-                    # Predict Trust only
-                    if "Random Forest" in model_choice:
-                        trust_pred = rf_model_trust.predict([[in_age_trust, in_gen_trust, in_edu_trust, u_use, in_knowledge]])
-                        model_name = "Random Forest"
-                        model_acc = rf_acc_trust
-                    else:
-                        trust_pred = xgb_model_trust.predict([[in_age_trust, in_gen_trust, in_edu_trust, u_use, in_knowledge]])
-                        model_name = "XGBoost"
-                        model_acc = xgb_acc_trust
-                    
-                    final_trust = encoders_trust[target_trust].inverse_transform(trust_pred)[0]
-                    
-                    st.balloons()
+                else: # Trust
                     st.markdown(f"""
                         <div class="prediction-card">
                             <h1 style="color:#60a5fa; margin:0; font-size: 48px;">🤝 {final_trust}</h1>
                             <p style="color:#94a3b8; font-size:20px; margin: 20px 0;">Predicted Trust in AI</p>
                             <div style="background: #0f172a; padding: 20px; border-radius: 10px; margin-top: 20px;">
-                                <p style="color:#10b981; font-size:16px; margin:5px;">Model: <b>{model_name}</b></p>
-                                <p style="color:#3b82f6; font-size:16px; margin:5px;">Confidence: <b>{model_acc*100:.1f}%</b></p>
-                                <p style="color:#f59e0b; font-size:16px; margin:5px;">Training Samples: <b>{len(ml_df_trust)}</b></p>
+                                <p style="color:#10b981; font-size:16px; margin:5px;">Model: <b>{model_name_trust}</b></p>
+                                <p style="color:#3b82f6; font-size:16px; margin:5px;">Confidence: <b>{trust_conf*100:.1f}%</b></p>
                             </div>
                         </div>
                     """, unsafe_allow_html=True)
@@ -567,11 +515,12 @@ if df is not None:
             target = 'Employment Status'
             
             ml_df = df[features + [target]].dropna()
-            encoders = {}
+            # Reuse logic or re-encode
+            le_dict = {}
             for col in ['Age Range', 'Gender', 'Education Level', target]:
                 le = LabelEncoder()
                 ml_df[col] = le.fit_transform(ml_df[col].astype(str))
-                encoders[col] = le
+                le_dict[col] = le
 
             X = ml_df[features]
             y = ml_df[target]
@@ -583,11 +532,11 @@ if df is not None:
             target = 'Trust in AI'
             
             ml_df = df[features + [target]].dropna()
-            encoders = {}
+            le_dict = {}
             for col in ['Age Range', 'Gender', 'Education Level', 'AI Knowledge', target]:
                 le = LabelEncoder()
                 ml_df[col] = le.fit_transform(ml_df[col].astype(str))
-                encoders[col] = le
+                le_dict[col] = le
 
             X = ml_df[features]
             y = ml_df[target]
@@ -738,4 +687,3 @@ if df is not None:
 
 else:
     st.error("❌ Data file not found. Please ensure the CSV is uploaded correctly.")
-
