@@ -7,106 +7,179 @@ from xgboost import XGBClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-import numpy as np
+import base64
 
 # --- PAGE CONFIG ---
-st.set_page_config(page_title="AI Social Impact Dashboard", layout="wide", page_icon="🤖")
+st.set_page_config(
+    page_title="AI Impact | Ultra Dashboard",
+    layout="wide",
+    page_icon="🤖",
+    initial_sidebar_state="expanded"
+)
 
-# --- ENHANCED DARK THEME CUSTOM CSS ---
+# --- 🎨 ULTRA-MODERN CSS THEME ---
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    /* IMPORT FONTS */
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
     
-    * { font-family: 'Inter', sans-serif; }
-    .stApp { 
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        color: #f8fafc; 
+    /* GLOBAL VARIABLES */
+    :root {
+        --primary: #6366f1;
+        --secondary: #8b5cf6;
+        --accent: #ec4899;
+        --bg-dark: #0f172a;
+        --glass-bg: rgba(30, 41, 59, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --text-white: #f8fafc;
     }
-    section[data-testid="stSidebar"] { 
-        background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
-        border-right: 2px solid #334155;
+
+    /* APP BACKGROUND & TYPOGRAPHY */
+    .stApp {
+        background-color: var(--bg-dark);
+        background-image: 
+            radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+            radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+            radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+        background-attachment: fixed;
+        font-family: 'Outfit', sans-serif;
     }
-    div[data-testid="stMetricValue"] { 
-        font-size: 36px; 
-        color: #60a5fa !important; 
-        font-weight: 700;
+    
+    h1, h2, h3, p, div, span {
+        font-family: 'Outfit', sans-serif !important;
+        color: var(--text-white);
     }
-    div[data-testid="metric-container"] {
-        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-        padding: 25px; 
+
+    /* SIDEBAR STYLING */
+    section[data-testid="stSidebar"] {
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(10px);
+        border-right: 1px solid var(--glass-border);
+    }
+
+    /* 🔮 GLASSMORPHISM CARDS */
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
         border-radius: 16px;
-        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
-        border: 2px solid #475569;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    div[data-testid="metric-container"]:hover {
+    
+    .glass-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 15px 40px -5px rgba(59, 130, 246, 0.4);
-        border-color: #3b82f6;
+        box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2);
+        border-color: rgba(99, 102, 241, 0.3);
     }
-    .stButton>button {
-        border-radius: 12px; 
-        height: 3.5em; 
-        background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
-        color: white; 
-        border: none; 
-        font-weight: 700;
-        width: 100%;
-        font-size: 16px;
-        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-        transition: all 0.3s ease;
+
+    /* METRIC CARDS HTML */
+    .metric-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
-    .stButton>button:hover {
-        background: linear-gradient(90deg, #2563eb 0%, #7c3aed 100%);
-        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
-        transform: translateY(-2px);
+    .metric-value {
+        font-size: 38px;
+        font-weight: 800;
+        background: -webkit-linear-gradient(45deg, #6366f1, #ec4899);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
-    label, p, span { color: #e2e8f0 !important; }
-    h1, h2, h3 { color: #60a5fa !important; font-weight: 700 !important; }
-    .stRadio > label { color: #94a3b8 !important; font-size: 14px; font-weight: 600; }
-    div[role="radiogroup"] > label {
-        background: #334155;
-        padding: 12px 20px;
-        border-radius: 10px;
-        margin: 5px 0;
-        border: 2px solid transparent;
-        transition: all 0.3s ease;
+    .metric-label {
+        font-size: 14px;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
-    div[role="radiogroup"] > label:hover {
-        border-color: #3b82f6;
-        background: #475569;
-    }
-    .prediction-card {
-        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-        padding: 40px;
-        border-radius: 20px;
-        border: 3px solid #3b82f6;
-        text-align: center;
-        box-shadow: 0 20px 50px rgba(59, 130, 246, 0.3);
-        animation: glow 2s ease-in-out infinite;
-    }
-    @keyframes glow {
-        0%, 100% { box-shadow: 0 20px 50px rgba(59, 130, 246, 0.3); }
-        50% { box-shadow: 0 20px 60px rgba(59, 130, 246, 0.6); }
-    }
-    .model-comparison {
-        background: #1e293b;
-        padding: 20px;
+
+    /* NEON BUTTONS */
+    .stButton > button {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        border: none;
         border-radius: 12px;
-        border-left: 4px solid #8b5cf6;
-        margin: 10px 0;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); 
+        width: 100%;
     }
-    .dual-prediction {
-        background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+    
+    .stButton > button:hover {
+        transform: scale(1.02);
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6);
+    }
+
+    /* CUSTOM RADIO BUTTONS (SIDEBAR) */
+    div[role="radiogroup"] > label {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid transparent;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        padding: 10px 15px;
+        transition: all 0.2s ease;
+    }
+    
+    div[role="radiogroup"] > label:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--primary);
+    }
+    
+    div[role="radiogroup"] label[data-checked="true"] {
+        background: linear-gradient(90deg, rgba(99, 102, 241, 0.2), transparent);
+        border-left: 4px solid var(--accent);
+    }
+
+    /* HEADERS */
+    .gradient-text {
+        background: linear-gradient(to right, #818cf8, #e879f9);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+    }
+
+    /* SLIDER CUSTOMIZATION */
+    div[data-testid="stSlider"] > div {
+        
+    }
+    
+    /* PREDICTION RESULT BOX */
+    .result-box {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.1));
+        border: 2px solid #10b981;
+        border-radius: 20px;
         padding: 30px;
-        border-radius: 15px;
-        margin: 20px 0;
         text-align: center;
-        border: 3px solid #f472b6;
+        animation: glow-pulse 3s infinite;
     }
+    
+    @keyframes glow-pulse {
+        0% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.1); }
+        50% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.4); }
+        100% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.1); }
+    }
+
     </style>
+""", unsafe_allow_html=True)
+
+# --- HELPER: CUSTOM CARD FUNCTION ---
+def card_metric(label, value, subtext="", icon="📊"):
+    st.markdown(f"""
+        <div class="glass-card metric-container">
+            <div style="font-size: 24px; margin-bottom: 5px;">{icon}</div>
+            <div class="metric-value">{value}</div>
+            <div class="metric-label">{label}</div>
+            <div style="font-size: 12px; color: #64748b; margin-top: 5px;">{subtext}</div>
+        </div>
     """, unsafe_allow_html=True)
 
+# --- DATA LOADING (WITH YOUR FIXED LOGIC) ---
 @st.cache_data
 def load_and_clean_data():
     file_path = 'cleaned_ai_impact_data_updated.csv'
@@ -120,11 +193,8 @@ def load_and_clean_data():
             continue
     
     if df is not None:
-        # Strip whitespace from column names
         df.columns = df.columns.str.strip()
-        
-        # --- FIX: RENAME COLUMNS TO MATCH CODE ---
-        # Maps CSV column names (underscores) to Code column names (spaces)
+        # Mapping
         rename_mapping = {
             'Age_Range': 'Age Range',
             'Employment_Status': 'Employment Status',
@@ -133,668 +203,251 @@ def load_and_clean_data():
             'AI_Usage_Scale': 'AI Usage Rating',
             'Education': 'Education Level',
             'Future_AI_Usage': 'Future AI Interest',
-            'Eliminate_Jobs': 'AI Job Impact',      # Mapped for "Yes/No" logic
-            'Threaten_Freedoms': 'AI Impact Perception' # Mapped for sentiment analysis
+            'Eliminate_Jobs': 'AI Job Impact',
+            'Threaten_Freedoms': 'AI Impact Perception'
         }
         df.rename(columns=rename_mapping, inplace=True)
-        
-        # Clean string columns
         for col in df.select_dtypes(include=['object']).columns:
             df[col] = df[col].astype(str).str.strip()
-            
         if 'ID' in df.columns:
             df.drop('ID', axis=1, inplace=True)
-            
     return df
 
+# --- ML TRAINING CACHE ---
 @st.cache_resource
-def train_models(X, y, model_type="employment"):
-    """Train both Random Forest and XGBoost models"""
+def train_models(X, y):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    rf = RandomForestClassifier(n_estimators=150, max_depth=10, random_state=42).fit(X_train, y_train)
+    xgb = XGBClassifier(n_estimators=150, max_depth=6, learning_rate=0.1, random_state=42).fit(X_train, y_train)
     
-    # Random Forest
-    rf_model = RandomForestClassifier(n_estimators=150, max_depth=10, random_state=42)
-    rf_model.fit(X_train, y_train)
-    rf_pred = rf_model.predict(X_test)
-    rf_accuracy = accuracy_score(y_test, rf_pred)
-    
-    # XGBoost
-    xgb_model = XGBClassifier(n_estimators=150, max_depth=6, learning_rate=0.1, random_state=42, eval_metric='logloss')
-    xgb_model.fit(X_train, y_train)
-    xgb_pred = xgb_model.predict(X_test)
-    xgb_accuracy = accuracy_score(y_test, xgb_pred)
-    
-    return rf_model, xgb_model, rf_accuracy, xgb_accuracy, X_test, y_test
+    rf_acc = accuracy_score(y_test, rf.predict(X_test))
+    xgb_acc = accuracy_score(y_test, xgb.predict(X_test))
+    return rf, xgb, rf_acc, xgb_acc
 
+# --- APP START ---
 df = load_and_clean_data()
 
 if df is not None:
-    # --- SIDEBAR ---
+    # --- SIDEBAR NAV ---
     with st.sidebar:
-        st.markdown("<h1 style='color: #60a5fa; text-align: center;'>🚀 AI Insight Hub</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; color: #94a3b8;'>Advanced Analytics Platform</p>", unsafe_allow_html=True)
-        st.divider()
+        st.markdown("<h2 class='gradient-text'>🤖 AI NEXUS</h2>", unsafe_allow_html=True)
+        st.write("Advanced Social Analytics Node")
+        st.markdown("---")
         
-        menu = st.radio("", ["📊 Dashboard", "🔬 Deep Insights", "🔮 Prediction Lab", "⚡ Model Comparison"])
+        menu = st.radio("NAVIGATION", 
+            ["Dashboard", "Deep Insights", "Prediction Lab", "Model Arena", "Data Explorer"],
+            label_visibility="collapsed"
+        )
         
-        st.divider()
-        st.markdown("""
-            <div style='background: #334155; padding: 15px; border-radius: 10px; text-align: center;'>
-                <p style='margin: 0; color: #60a5fa; font-size: 14px;'>📈 <b>Dual Model System</b></p>
-                <p style='margin: 5px 0 0 0; color: #10b981; font-size: 20px; font-weight: 700;'>Employment & Trust</p>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.info("💡 **Tip:** Predict both Employment Status AND Trust in AI!")
+        st.markdown("---")
+        st.markdown("### ⚙️ System Status")
+        st.success("● Models Online")
+        st.info(f"● {len(df)} Records Loaded")
 
-    if menu == "📊 Dashboard":
-        st.markdown("<h1 style='text-align: center;'>🌐 AI Social Impact Dashboard</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 18px;'>Real-time insights from survey data analysis</p>", unsafe_allow_html=True)
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        # Enhanced Metrics
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("📋 Total Responses", len(df), delta="+12 this week")
-        c2.metric("🧠 Avg AI Knowledge", "Moderate", delta="↑ 15%")
-        
-        # Error handling if columns are missing
-        if 'AI Usage Rating' in df.columns:
-            avg_usage = f"{df['AI Usage Rating'].mean():.1f}/5"
-        else:
-            avg_usage = "N/A"
-        c3.metric("⭐ Avg Usage Score", avg_usage, delta="+0.3")
-        
-        if 'Education Level' in df.columns:
-            top_edu = df['Education Level'].mode()[0][:15] + "..."
-        else:
-            top_edu = "N/A"
-        c4.metric("🎓 Top Education", top_edu)
-
-        st.divider()
-
-        col1, col2 = st.columns(2)
-        with col1:
-            st.subheader("📊 Distribution of Age Ranges")
-            if 'Age Range' in df.columns:
-                fig_age = px.histogram(df, x='Age Range', color='Age Range', 
-                                       template="plotly_dark",
-                                       color_discrete_sequence=px.colors.qualitative.Bold)
-                fig_age.update_layout(showlegend=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-                st.plotly_chart(fig_age, use_container_width=True)
-            else:
-                st.error("Column 'Age Range' not found.")
-
-        with col2:
-            st.subheader("🤝 Trust in AI vs. AI Knowledge")
-            if 'AI Knowledge' in df.columns and 'Trust in AI' in df.columns:
-                fig_trust_know = px.histogram(df, x='AI Knowledge', color='Trust in AI', barmode='group',
-                                              template="plotly_dark", 
-                                              color_discrete_sequence=px.colors.qualitative.Vivid)
-                fig_trust_know.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-                st.plotly_chart(fig_trust_know, use_container_width=True)
-            else:
-                st.error("Columns for Trust/Knowledge not found.")
-
-        # Additional Overview Stats
-        st.markdown("<br>", unsafe_allow_html=True)
-        col_a, col_b, col_c = st.columns(3)
-        with col_a:
-            if 'Trust in AI' in df.columns:
-                trust_pct = (df['Trust in AI'].value_counts(normalize=True).iloc[0] * 100)
-            else:
-                trust_pct = 0
-            st.markdown(f"""
-                <div class='model-comparison'>
-                    <h3 style='color: #10b981;'>✅ Trust Rate</h3>
-                    <h1 style='color: #10b981; margin: 10px 0;'>{trust_pct:.1f}%</h1>
-                    <p style='color: #94a3b8;'>of respondents trust AI</p>
-                </div>
-            """, unsafe_allow_html=True)
-        
-        with col_b:
-            if 'Future AI Interest' in df.columns:
-                future_interest = (df['Future AI Interest'].value_counts(normalize=True).iloc[0] * 100)
-            else:
-                future_interest = 0
-            st.markdown(f"""
-                <div class='model-comparison'>
-                    <h3 style='color: #3b82f6;'>🚀 Future Interest</h3>
-                    <h1 style='color: #3b82f6; margin: 10px 0;'>{future_interest:.1f}%</h1>
-                    <p style='color: #94a3b8;'>want more AI products</p>
-                </div>
-            """, unsafe_allow_html=True)
-        
-        with col_c:
-            if 'AI Job Impact' in df.columns:
-                job_concern_count = len(df[df['AI Job Impact'].astype(str).str.lower() == 'yes'])
-                job_concern_pct = (job_concern_count / len(df)) * 100
-            else:
-                job_concern_pct = 0
-            
-            st.markdown(f"""
-                <div class='model-comparison'>
-                    <h3 style='color: #f59e0b;'>⚠️ Job Concern</h3>
-                    <h1 style='color: #f59e0b; margin: 10px 0;'>{job_concern_pct:.1f}%</h1>
-                    <p style='color: #94a3b8;'>worry about job impact</p>
-                </div>
-            """, unsafe_allow_html=True)
-
-    elif menu == "🔬 Deep Insights":
-        st.markdown("<h1 style='text-align: center;'>🔬 Advanced Analysis</h1>", unsafe_allow_html=True)
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        col_a, col_b = st.columns(2)
-        with col_a:
-            st.subheader("🌍 Perceived Impact on Humanity")
-            if 'AI Impact Perception' in df.columns:
-                impact_data = df['AI Impact Perception'].value_counts().reset_index()
-                fig_impact = px.bar(impact_data, 
-                                   y='AI Impact Perception', x='count', orientation='h',
-                                   template="plotly_dark", color='AI Impact Perception',
-                                   color_discrete_sequence=px.colors.sequential.Viridis)
-                fig_impact.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-                st.plotly_chart(fig_impact, use_container_width=True)
-            else:
-                st.error("Column 'AI Impact Perception' not found.")
-
-        with col_b:
-            st.subheader("💼 AI Job Impact by Education")
-            if 'Education Level' in df.columns and 'AI Job Impact' in df.columns:
-                fig_job = px.histogram(df, x='Education Level', color='AI Job Impact', barmode='group',
-                                       template="plotly_dark",
-                                       color_discrete_sequence=px.colors.qualitative.Safe)
-                fig_job.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-                st.plotly_chart(fig_job, use_container_width=True)
-
-        st.divider()
-        st.subheader("📈 AI Usage Rating vs. Trust in AI")
-        if 'Trust in AI' in df.columns and 'AI Usage Rating' in df.columns:
-            fig_usage_trust = px.box(df, x='Trust in AI', y='AI Usage Rating', color='Trust in AI',
-                                     template="plotly_dark", points="all",
-                                     color_discrete_sequence=px.colors.qualitative.Prism)
-            fig_usage_trust.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-            st.plotly_chart(fig_usage_trust, use_container_width=True)
-
-        # Correlation Heatmap
-        st.divider()
-        st.subheader("🔥 Feature Correlation Matrix")
-        numeric_cols = ['AI Usage Rating']
-        if len(numeric_cols) > 0:
-            # Create encoded version for correlation
-            corr_df = df.copy()
-            for col in ['Age Range', 'Gender', 'Education Level', 'Employment Status', 'AI Knowledge', 'Trust in AI']:
-                if col in corr_df.columns:
-                    le = LabelEncoder()
-                    corr_df[col + '_encoded'] = le.fit_transform(corr_df[col].astype(str))
-            
-            correlation_cols = [c for c in corr_df.columns if '_encoded' in c or c == 'AI Usage Rating']
-            if correlation_cols:
-                corr_matrix = corr_df[correlation_cols].corr()
-                
-                fig_corr = go.Figure(data=go.Heatmap(
-                    z=corr_matrix.values,
-                    x=[c.replace('_encoded', '') for c in corr_matrix.columns],
-                    y=[c.replace('_encoded', '') for c in corr_matrix.index],
-                    colorscale='Viridis',
-                    text=corr_matrix.values,
-                    texttemplate='%{text:.2f}',
-                    textfont={"size": 10}
-                ))
-                fig_corr.update_layout(template="plotly_dark", height=500,
-                                       plot_bgcolor='rgba(0,0,0,0)', 
-                                       paper_bgcolor='rgba(0,0,0,0)')
-                st.plotly_chart(fig_corr, use_container_width=True)
-
-    elif menu == "🔮 Prediction Lab":
-        st.markdown("<h1 style='text-align: center;'>🔮 AI Prediction Lab</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 18px;'>Dual Prediction System: Employment Status & Trust in AI</p>", unsafe_allow_html=True)
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        # Prediction Target Selection
-        st.markdown("### 🎯 Choose What to Predict:")
-        prediction_target = st.radio("", 
-                                     ["💼 Employment Status Only", 
-                                      "🤝 Trust in AI Only", 
-                                      "🔥 Both (Dual Prediction)"],
-                                     horizontal=True)
-
-        # Model Selection
-        model_choice = st.radio("**Choose Your ML Model:**", 
-                               ["🌲 Random Forest", "⚡ XGBoost (Faster & More Accurate)"],
-                               horizontal=True)
-
-        st.divider()
-
-        # Prepare data for Employment Status
-        features_employment = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating']
-        target_employment = 'Employment Status'
-        
-        ml_df_emp = df[features_employment + [target_employment]].dropna()
-        encoders_emp = {}
-        for col in ['Age Range', 'Gender', 'Education Level', target_employment]:
-            le = LabelEncoder()
-            ml_df_emp[col] = le.fit_transform(ml_df_emp[col].astype(str))
-            encoders_emp[col] = le
-
-        X_emp = ml_df_emp[features_employment]
-        y_emp = ml_df_emp[target_employment]
-        
-        # Prepare data for Trust in AI
-        features_trust = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating', 'AI Knowledge']
-        target_trust = 'Trust in AI'
-        
-        ml_df_trust = df[features_trust + [target_trust]].dropna()
-        encoders_trust = {}
-        for col in ['Age Range', 'Gender', 'Education Level', 'AI Knowledge', target_trust]:
-            le = LabelEncoder()
-            ml_df_trust[col] = le.fit_transform(ml_df_trust[col].astype(str))
-            encoders_trust[col] = le
-
-        X_trust = ml_df_trust[features_trust]
-        y_trust = ml_df_trust[target_trust]
-        
-        # Train models UNCONDITIONALLY so they exist regardless of user selection
-        rf_model_emp, xgb_model_emp, rf_acc_emp, xgb_acc_emp, _, _ = train_models(X_emp, y_emp, "employment")
-        rf_model_trust, xgb_model_trust, rf_acc_trust, xgb_acc_trust, _, _ = train_models(X_trust, y_trust, "trust")
-
-        # Display Model Stats based on selection
-        if "Both" in prediction_target:
-            st.markdown("### 📊 Model Performance Overview")
-            col_a, col_b = st.columns(2)
-            
-            with col_a:
-                st.markdown("#### 💼 Employment Status Model")
-                col_stat1, col_stat2 = st.columns(2)
-                with col_stat1:
-                    st.markdown(f"""
-                        <div class='model-comparison'>
-                            <h4>🌲 Random Forest</h4>
-                            <h3 style='color: #10b981;'>{rf_acc_emp*100:.2f}%</h3>
-                        </div>
-                    """, unsafe_allow_html=True)
-                with col_stat2:
-                    st.markdown(f"""
-                        <div class='model-comparison'>
-                            <h4>⚡ XGBoost</h4>
-                            <h3 style='color: #3b82f6;'>{xgb_acc_emp*100:.2f}%</h3>
-                        </div>
-                    """, unsafe_allow_html=True)
-            
-            with col_b:
-                st.markdown("#### 🤝 Trust in AI Model")
-                col_stat3, col_stat4 = st.columns(2)
-                with col_stat3:
-                    st.markdown(f"""
-                        <div class='model-comparison'>
-                            <h4>🌲 Random Forest</h4>
-                            <h3 style='color: #10b981;'>{rf_acc_trust*100:.2f}%</h3>
-                        </div>
-                    """, unsafe_allow_html=True)
-                with col_stat4:
-                    st.markdown(f"""
-                        <div class='model-comparison'>
-                            <h4>⚡ XGBoost</h4>
-                            <h3 style='color: #3b82f6;'>{xgb_acc_trust*100:.2f}%</h3>
-                        </div>
-                    """, unsafe_allow_html=True)
-        
-        elif "Employment" in prediction_target:
-            col_stat1, col_stat2 = st.columns(2)
-            with col_stat1:
-                st.markdown(f"""
-                    <div class='model-comparison'>
-                        <h3>🌲 Random Forest</h3>
-                        <h2 style='color: #10b981;'>{rf_acc_emp*100:.2f}% Accuracy</h2>
-                        <p style='color: #94a3b8;'>Employment Status Prediction</p>
-                    </div>
-                """, unsafe_allow_html=True)
-            
-            with col_stat2:
-                st.markdown(f"""
-                    <div class='model-comparison'>
-                        <h3>⚡ XGBoost</h3>
-                        <h2 style='color: #3b82f6;'>{xgb_acc_emp*100:.2f}% Accuracy</h2>
-                        <p style='color: #94a3b8;'>Employment Status Prediction</p>
-                    </div>
-                """, unsafe_allow_html=True)
-        
-        else:  # Trust only
-            col_stat1, col_stat2 = st.columns(2)
-            with col_stat1:
-                st.markdown(f"""
-                    <div class='model-comparison'>
-                        <h3>🌲 Random Forest</h3>
-                        <h2 style='color: #10b981;'>{rf_acc_trust*100:.2f}% Accuracy</h2>
-                        <p style='color: #94a3b8;'>Trust in AI Prediction</p>
-                    </div>
-                """, unsafe_allow_html=True)
-            
-            with col_stat2:
-                st.markdown(f"""
-                    <div class='model-comparison'>
-                        <h3>⚡ XGBoost</h3>
-                        <h2 style='color: #3b82f6;'>{xgb_acc_trust*100:.2f}% Accuracy</h2>
-                        <p style='color: #94a3b8;'>Trust in AI Prediction</p>
-                    </div>
-                """, unsafe_allow_html=True)
-
-        st.divider()
-
-        # User Input Form
-        
-        # Determine which encoder to use for the dropdown options based on target
-        if "Trust" in prediction_target and "Both" not in prediction_target:
-             ui_encoders = encoders_trust
-        else:
-             ui_encoders = encoders_emp
-
-        with st.container():
-            c_left, c_right = st.columns(2)
-            u_age = c_left.selectbox("🎂 Your Age Range", ui_encoders['Age Range'].classes_)
-            u_gen = c_left.selectbox("👤 Your Gender", ui_encoders['Gender'].classes_)
-            u_edu = c_right.selectbox("🎓 Education Level", ui_encoders['Education Level'].classes_)
-            u_use = c_right.select_slider("📱 AI Usage Level", options=[1, 2, 3, 4, 5], value=3)
-            
-            # Only show AI Knowledge if predicting Trust OR Both
-            u_knowledge = None
-            if "Trust" in prediction_target or "Both" in prediction_target:
-                # Use encoders_trust for this specific field
-                u_knowledge = st.selectbox("🧠 AI Knowledge Level", encoders_trust['AI Knowledge'].classes_)
-
-            st.markdown("<br>", unsafe_allow_html=True)
-            
-            if st.button("🚀 PREDICT NOW"):
-                # --- FIXED: LOGIC TO PREPARE INPUTS BASED ON TARGET ---
-                
-                # 1. Prepare Employment Inputs if needed
-                if "Employment" in prediction_target or "Both" in prediction_target:
-                    in_age_emp = encoders_emp['Age Range'].transform([u_age])[0]
-                    in_gen_emp = encoders_emp['Gender'].transform([u_gen])[0]
-                    in_edu_emp = encoders_emp['Education Level'].transform([u_edu])[0]
-
-                # 2. Prepare Trust Inputs if needed (This was missing!)
-                if "Trust" in prediction_target or "Both" in prediction_target:
-                    in_age_trust = encoders_trust['Age Range'].transform([u_age])[0]
-                    in_gen_trust = encoders_trust['Gender'].transform([u_gen])[0]
-                    in_edu_trust = encoders_trust['Education Level'].transform([u_edu])[0]
-                    in_knowledge_encoded = encoders_trust['AI Knowledge'].transform([u_knowledge])[0]
-                
-                # Make predictions based on selection
-                if "Both" in prediction_target:
-                    # Predict both
-                    if "Random Forest" in model_choice:
-                        emp_pred = rf_model_emp.predict([[in_age_emp, in_gen_emp, in_edu_emp, u_use]])
-                        trust_pred = rf_model_trust.predict([[in_age_trust, in_gen_trust, in_edu_trust, u_use, in_knowledge_encoded]])
-                        model_name = "Random Forest"
-                        emp_acc = rf_acc_emp
-                        trust_acc = rf_acc_trust
-                    else:
-                        emp_pred = xgb_model_emp.predict([[in_age_emp, in_gen_emp, in_edu_emp, u_use]])
-                        trust_pred = xgb_model_trust.predict([[in_age_trust, in_gen_trust, in_edu_trust, u_use, in_knowledge_encoded]])
-                        model_name = "XGBoost"
-                        emp_acc = xgb_acc_emp
-                        trust_acc = xgb_acc_trust
-                    
-                    final_emp = encoders_emp[target_employment].inverse_transform(emp_pred)[0]
-                    final_trust = encoders_trust[target_trust].inverse_transform(trust_pred)[0]
-                    
-                    st.balloons()
-                    st.markdown(f"""
-                        <div class="dual-prediction">
-                            <h1 style="color: white; margin: 0; font-size: 42px;">🎯 Dual Prediction Results</h1>
-                            <br>
-                            <div style="display: flex; gap: 20px; justify-content: space-around; margin-top: 20px;">
-                                <div style="background: #0f172a; padding: 25px; border-radius: 15px; flex: 1;">
-                                    <h2 style="color: #60a5fa; margin: 0;">💼 Employment Status</h2>
-                                    <h1 style="color: #10b981; margin: 15px 0; font-size: 36px;">{final_emp}</h1>
-                                    <p style="color: #94a3b8;">Confidence: {emp_acc*100:.1f}%</p>
-                                </div>
-                                <div style="background: #0f172a; padding: 25px; border-radius: 15px; flex: 1;">
-                                    <h2 style="color: #60a5fa; margin: 0;">🤝 Trust Level</h2>
-                                    <h1 style="color: #f59e0b; margin: 15px 0; font-size: 36px;">{final_trust}</h1>
-                                    <p style="color: #94a3b8;">Confidence: {trust_acc*100:.1f}%</p>
-                                </div>
-                            </div>
-                            <br>
-                            <p style="color: white; font-size: 16px; margin-top: 20px;">Model: <b>{model_name}</b></p>
-                        </div>
-                    """, unsafe_allow_html=True)
-                
-                elif "Employment" in prediction_target:
-                    # Predict Employment only
-                    if "Random Forest" in model_choice:
-                        emp_pred = rf_model_emp.predict([[in_age_emp, in_gen_emp, in_edu_emp, u_use]])
-                        model_name = "Random Forest"
-                        model_acc = rf_acc_emp
-                    else:
-                        emp_pred = xgb_model_emp.predict([[in_age_emp, in_gen_emp, in_edu_emp, u_use]])
-                        model_name = "XGBoost"
-                        model_acc = xgb_acc_emp
-                    
-                    final_emp = encoders_emp[target_employment].inverse_transform(emp_pred)[0]
-                    
-                    st.balloons()
-                    st.markdown(f"""
-                        <div class="prediction-card">
-                            <h1 style="color:#60a5fa; margin:0; font-size: 48px;">💼 {final_emp}</h1>
-                            <p style="color:#94a3b8; font-size:20px; margin: 20px 0;">Predicted Employment Status</p>
-                            <div style="background: #0f172a; padding: 20px; border-radius: 10px; margin-top: 20px;">
-                                <p style="color:#10b981; font-size:16px; margin:5px;">Model: <b>{model_name}</b></p>
-                                <p style="color:#3b82f6; font-size:16px; margin:5px;">Confidence: <b>{model_acc*100:.1f}%</b></p>
-                                <p style="color:#f59e0b; font-size:16px; margin:5px;">Training Samples: <b>{len(ml_df_emp)}</b></p>
-                            </div>
-                        </div>
-                    """, unsafe_allow_html=True)
-                
-                else:  # Trust only
-                    # Predict Trust only
-                    if "Random Forest" in model_choice:
-                        trust_pred = rf_model_trust.predict([[in_age_trust, in_gen_trust, in_edu_trust, u_use, in_knowledge_encoded]])
-                        model_name = "Random Forest"
-                        model_acc = rf_acc_trust
-                    else:
-                        trust_pred = xgb_model_trust.predict([[in_age_trust, in_gen_trust, in_edu_trust, u_use, in_knowledge_encoded]])
-                        model_name = "XGBoost"
-                        model_acc = xgb_acc_trust
-                    
-                    final_trust = encoders_trust[target_trust].inverse_transform(trust_pred)[0]
-                    
-                    st.balloons()
-                    st.markdown(f"""
-                        <div class="prediction-card">
-                            <h1 style="color:#60a5fa; margin:0; font-size: 48px;">🤝 {final_trust}</h1>
-                            <p style="color:#94a3b8; font-size:20px; margin: 20px 0;">Predicted Trust in AI</p>
-                            <div style="background: #0f172a; padding: 20px; border-radius: 10px; margin-top: 20px;">
-                                <p style="color:#10b981; font-size:16px; margin:5px;">Model: <b>{model_name}</b></p>
-                                <p style="color:#3b82f6; font-size:16px; margin:5px;">Confidence: <b>{model_acc*100:.1f}%</b></p>
-                                <p style="color:#f59e0b; font-size:16px; margin:5px;">Training Samples: <b>{len(ml_df_trust)}</b></p>
-                            </div>
-                        </div>
-                    """, unsafe_allow_html=True)
-
-    else:  # Model Comparison
-        st.markdown("<h1 style='text-align: center;'>⚡ Model Performance Comparison</h1>", unsafe_allow_html=True)
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        # Choose which target to compare
-        comparison_target = st.radio("**Compare models for:**", 
-                                     ["💼 Employment Status", "🤝 Trust in AI"],
-                                     horizontal=True)
-
-        if "Employment" in comparison_target:
-            features = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating']
-            target = 'Employment Status'
-            
-            ml_df = df[features + [target]].dropna()
-            encoders = {}
-            for col in ['Age Range', 'Gender', 'Education Level', target]:
-                le = LabelEncoder()
-                ml_df[col] = le.fit_transform(ml_df[col].astype(str))
-                encoders[col] = le
-
-            X = ml_df[features]
-            y = ml_df[target]
-            
-            rf_model, xgb_model, rf_acc, xgb_acc, X_test, y_test = train_models(X, y, "employment")
+    # --- MAIN CONTENT ---
     
-        else:  # Trust in AI
-            features = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating', 'AI Knowledge']
-            target = 'Trust in AI'
-            
-            ml_df = df[features + [target]].dropna()
-            encoders = {}
-            for col in ['Age Range', 'Gender', 'Education Level', 'AI Knowledge', target]:
-                le = LabelEncoder()
-                ml_df[col] = le.fit_transform(ml_df[col].astype(str))
-                encoders[col] = le
+    # 1. DASHBOARD
+    if menu == "Dashboard":
+        st.markdown("<h1 class='gradient-text'>🌐 Global Overview</h1>", unsafe_allow_html=True)
+        st.markdown("<p style='color: #94a3b8;'>Real-time analysis of Artificial Intelligence perception.</p>", unsafe_allow_html=True)
+        
+        # Ultra Metrics
+        c1, c2, c3, c4 = st.columns(4)
+        with c1: card_metric("Total Responses", len(df), "Updated live", "📋")
+        with c2: card_metric("Avg Usage", f"{df['AI Usage Rating'].mean():.1f}/5", "Out of 5.0", "⭐")
+        with c3: card_metric("Trust Factor", f"{(df['Trust in AI'].value_counts(normalize=True).iloc[0]*100):.0f}%", "Trusting Population", "🛡️")
+        with c4: card_metric("Knowledge Base", "Moderate", "Avg. User Level", "🧠")
 
-            X = ml_df[features]
-            y = ml_df[target]
-            
-            rf_model, xgb_model, rf_acc, xgb_acc, X_test, y_test = train_models(X, y, "trust")
-
-        # Comparison Metrics
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.markdown("### 🌲 Random Forest Classifier")
-            st.markdown(f"""
-                <div style='background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
-                     padding: 30px; border-radius: 15px; text-align: center;'>
-                    <h1 style='color: white; font-size: 56px; margin: 0;'>{rf_acc*100:.2f}%</h1>
-                    <p style='color: #d1fae5; font-size: 18px; margin-top: 10px;'>Test Accuracy</p>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.info("""
-                **Strengths:**
-                - ✅ Handles non-linear relationships well
-                - ✅ Robust to overfitting
-                - ✅ Easy to interpret feature importance
-                - ✅ Works well with small to medium datasets
-            """)
-        
-        with col2:
-            st.markdown("### ⚡ XGBoost Classifier")
-            st.markdown(f"""
-                <div style='background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
-                     padding: 30px; border-radius: 15px; text-align: center;'>
-                    <h1 style='color: white; font-size: 56px; margin: 0;'>{xgb_acc*100:.2f}%</h1>
-                    <p style='color: #dbeafe; font-size: 18px; margin-top: 10px;'>Test Accuracy</p>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.success("""
-                **Strengths:**
-                - ⚡ Faster training speed
-                - ⚡ Better performance on complex patterns
-                - ⚡ Built-in regularization prevents overfitting
-                - ⚡ Handles missing values automatically
-            """)
-
-        st.divider()
-
-        # Feature Importance Comparison
-        st.markdown("### 📊 Feature Importance Comparison")
-        
-        col_imp1, col_imp2 = st.columns(2)
-        
-        with col_imp1:
-            # Random Forest Feature Importance
-            rf_importance = pd.DataFrame({
-                'Feature': features,
-                'Importance': rf_model.feature_importances_
-            }).sort_values('Importance', ascending=True)
-            
-            fig_rf_imp = go.Figure(go.Bar(
-                x=rf_importance['Importance'],
-                y=rf_importance['Feature'],
-                orientation='h',
-                marker=dict(
-                    color=rf_importance['Importance'],
-                    colorscale='Greens',
-                    showscale=True
-                )
-            ))
-            fig_rf_imp.update_layout(
-                title="Random Forest Feature Importance",
-                template="plotly_dark",
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                xaxis_title="Importance",
-                yaxis_title="Feature",
-                height=400
-            )
-            st.plotly_chart(fig_rf_imp, use_container_width=True)
-        
-        with col_imp2:
-            # XGBoost Feature Importance
-            xgb_importance = pd.DataFrame({
-                'Feature': features,
-                'Importance': xgb_model.feature_importances_
-            }).sort_values('Importance', ascending=True)
-            
-            fig_xgb_imp = go.Figure(go.Bar(
-                x=xgb_importance['Importance'],
-                y=xgb_importance['Feature'],
-                orientation='h',
-                marker=dict(
-                    color=xgb_importance['Importance'],
-                    colorscale='Blues',
-                    showscale=True
-                )
-            ))
-            fig_xgb_imp.update_layout(
-                title="XGBoost Feature Importance",
-                template="plotly_dark",
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                xaxis_title="Importance",
-                yaxis_title="Feature",
-                height=400
-            )
-            st.plotly_chart(fig_xgb_imp, use_container_width=True)
-
-        # Accuracy Comparison Chart
-        st.divider()
-        st.markdown("### 🎯 Model Accuracy Comparison")
-        
-        comparison_df = pd.DataFrame({
-            'Model': ['Random Forest', 'XGBoost'],
-            'Accuracy': [rf_acc * 100, xgb_acc * 100]
-        })
-        
-        fig_comparison = px.bar(comparison_df, x='Model', y='Accuracy',
-                               template="plotly_dark",
-                               color='Model',
-                               color_discrete_sequence=['#10b981', '#3b82f6'],
-                               text='Accuracy')
-        fig_comparison.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
-        fig_comparison.update_layout(plot_bgcolor='rgba(0,0,0,0)', 
-                                     paper_bgcolor='rgba(0,0,0,0)',
-                                     height=400,
-                                     yaxis_range=[0, 100])
-        st.plotly_chart(fig_comparison, use_container_width=True)
-
-        # Winner Declaration
         st.markdown("<br>", unsafe_allow_html=True)
-        winner = "XGBoost" if xgb_acc > rf_acc else "Random Forest"
-        winner_acc = max(xgb_acc, rf_acc) * 100
         
-        st.markdown(f"""
-            <div style='background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-                 padding: 40px; border-radius: 20px; text-align: center;
-                 border: 3px solid #a78bfa;'>
-                <h1 style='color: white; font-size: 48px; margin: 0;'>🏆 Winner: {winner}</h1>
-                <p style='color: #e9d5ff; font-size: 24px; margin-top: 15px;'>
-                    Achieved {winner_acc:.2f}% accuracy on test data
-                </p>
-                <p style='color: #e9d5ff; font-size: 18px;'>Predicting: {comparison_target}</p>
+        # Glass Containers for Charts
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+            st.markdown("### 📊 Demographics: Age")
+            if 'Age Range' in df.columns:
+                fig = px.pie(df, names='Age Range', hole=0.6, color_discrete_sequence=px.colors.qualitative.Pastel)
+                fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font_color="white")
+                st.plotly_chart(fig, use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        with col2:
+            st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+            st.markdown("### 🤝 Trust Distribution")
+            if 'Trust in AI' in df.columns:
+                fig = px.bar(df['Trust in AI'].value_counts(), orientation='h', 
+                             color_discrete_sequence=['#6366f1'])
+                fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font_color="white", showlegend=False)
+                st.plotly_chart(fig, use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+
+    # 2. DEEP INSIGHTS
+    elif menu == "Deep Insights":
+        st.markdown("<h1 class='gradient-text'>🔬 Deep Dive Analytics</h1>", unsafe_allow_html=True)
+        
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+        st.subheader("🔥 Multi-Variable Correlation Heatmap")
+        
+        # Prepare Heatmap
+        corr_df = df.copy()
+        for col in ['Age Range', 'Gender', 'Education Level', 'Employment Status', 'AI Knowledge', 'Trust in AI']:
+            if col in corr_df.columns:
+                corr_df[col] = LabelEncoder().fit_transform(corr_df[col].astype(str))
+        
+        numeric_cols = corr_df.select_dtypes(include=[int, float]).columns
+        corr = corr_df[numeric_cols].corr()
+        
+        fig = go.Figure(data=go.Heatmap(
+            z=corr.values, x=corr.columns, y=corr.columns,
+            colorscale='Magma', text=corr.values, texttemplate='%{text:.2f}'
+        ))
+        fig.update_layout(height=600, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font_color="white")
+        st.plotly_chart(fig, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        c1, c2 = st.columns(2)
+        with c1:
+            st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+            st.markdown("### 🎓 Education vs Fear of Job Loss")
+            fig2 = px.histogram(df, x="Education Level", color="AI Job Impact", barmode="group",
+                                color_discrete_sequence=px.colors.qualitative.Safe)
+            fig2.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font_color="white")
+            st.plotly_chart(fig2, use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+
+    # 3. PREDICTION LAB
+    elif menu == "Prediction Lab":
+        st.markdown("<h1 class='gradient-text'>🔮 Future Prediction Engine</h1>", unsafe_allow_html=True)
+        
+        # Setup Data
+        features_emp = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating']
+        ml_df_emp = df[features_emp + ['Employment Status']].dropna()
+        
+        features_trust = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating', 'AI Knowledge']
+        ml_df_trust = df[features_trust + ['Trust in AI']].dropna()
+
+        # Encoders
+        enc_emp = {col: LabelEncoder().fit(ml_df_emp[col].astype(str)) for col in features_emp + ['Employment Status']}
+        enc_trust = {col: LabelEncoder().fit(ml_df_trust[col].astype(str)) for col in features_trust + ['Trust in AI']}
+
+        # Prepare X, y
+        for col in features_emp: ml_df_emp[col] = enc_emp[col].transform(ml_df_emp[col].astype(str))
+        ml_df_emp['Employment Status'] = enc_emp['Employment Status'].transform(ml_df_emp['Employment Status'].astype(str))
+        
+        for col in features_trust: ml_df_trust[col] = enc_trust[col].transform(ml_df_trust[col].astype(str))
+        ml_df_trust['Trust in AI'] = enc_trust['Trust in AI'].transform(ml_df_trust['Trust in AI'].astype(str))
+
+        # Train
+        rf_e, xgb_e, _, _ = train_models(ml_df_emp[features_emp], ml_df_emp['Employment Status'])
+        rf_t, xgb_t, _, _ = train_models(ml_df_trust[features_trust], ml_df_trust['Trust in AI'])
+
+        # Input Section
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+        st.subheader("👤 Subject Profile")
+        c1, c2, c3 = st.columns(3)
+        age = c1.selectbox("Age Range", enc_emp['Age Range'].classes_)
+        gender = c2.selectbox("Gender", enc_emp['Gender'].classes_)
+        edu = c3.selectbox("Education", enc_emp['Education Level'].classes_)
+        usage = st.slider("AI Usage Intensity", 1, 5, 3)
+        knowledge = st.select_slider("AI Knowledge Level", options=enc_trust['AI Knowledge'].classes_)
+        
+        predict_btn = st.button("🚀 INITIALIZE PREDICTION SEQUENCE")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        if predict_btn:
+            with st.spinner('⚡ Calculating Probabilities...'):
+                # Prepare Inputs
+                input_emp = [enc_emp[c].transform([val])[0] for c, val in zip(features_emp, [age, gender, edu, usage])]
+                input_trust = [enc_trust[c].transform([val])[0] for c, val in zip(features_trust, [age, gender, edu, usage, knowledge])]
+                
+                # Predict (Using XGBoost as default "Ultra" model)
+                pred_emp = enc_emp['Employment Status'].inverse_transform(xgb_e.predict([input_emp]))[0]
+                pred_trust = enc_trust['Trust in AI'].inverse_transform(xgb_t.predict([input_trust]))[0]
+                
+                st.markdown("<br>", unsafe_allow_html=True)
+                r1, r2 = st.columns(2)
+                
+                with r1:
+                    st.markdown(f"""
+                    <div class="result-box">
+                        <h3 style="color:#60a5fa; margin:0;">💼 Employment Status</h3>
+                        <h1 style="font-size:42px; color:white; margin:10px 0;">{pred_emp}</h1>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with r2:
+                    st.markdown(f"""
+                    <div class="result-box" style="border-color: #f59e0b; box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);">
+                        <h3 style="color:#f59e0b; margin:0;">🤝 Trust Level</h3>
+                        <h1 style="font-size:42px; color:white; margin:10px 0;">{pred_trust}</h1>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+    # 4. MODEL ARENA
+    elif menu == "Model Arena":
+        st.markdown("<h1 class='gradient-text'>⚔️ Model Performance Arena</h1>", unsafe_allow_html=True)
+        
+        # Simulating data again for quick access
+        features = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating']
+        ml_df = df[features + ['Employment Status']].dropna()
+        le_dict = {c: LabelEncoder().fit(ml_df[c].astype(str)) for c in ml_df.columns}
+        for c in ml_df.columns: ml_df[c] = le_dict[c].transform(ml_df[c].astype(str))
+        
+        rf, xgb, rf_acc, xgb_acc = train_models(ml_df[features], ml_df['Employment Status'])
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown(f"""
+            <div class="glass-card" style="border-left: 5px solid #10b981;">
+                <h2>🌲 Random Forest</h2>
+                <h1 style="color: #10b981; font-size: 50px;">{rf_acc*100:.2f}%</h1>
+                <p>Accuracy Score</p>
             </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
+            
+        with col2:
+            st.markdown(f"""
+            <div class="glass-card" style="border-left: 5px solid #3b82f6;">
+                <h2>⚡ XGBoost</h2>
+                <h1 style="color: #3b82f6; font-size: 50px;">{xgb_acc*100:.2f}%</h1>
+                <p>Accuracy Score</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        # Feature Importance
+        st.markdown("### 🧠 Feature Importance Architecture")
+        imp = pd.DataFrame({'Feature': features, 'Importance': xgb.feature_importances_}).sort_values('Importance', ascending=True)
+        fig = px.bar(imp, x='Importance', y='Feature', orientation='h', template="plotly_dark",
+                     color='Importance', color_continuous_scale='Viridis')
+        fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+        st.plotly_chart(fig, use_container_width=True)
+
+    # 5. DATA EXPLORER (New Feature)
+    elif menu == "Data Explorer":
+        st.markdown("<h1 class='gradient-text'>💾 Raw Data Vault</h1>", unsafe_allow_html=True)
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+        
+        with st.expander("🔎 Filter & Search Options", expanded=True):
+            cols = st.multiselect("Select Columns to View", df.columns.tolist(), default=df.columns[:5].tolist())
+            search = st.text_input("Search Keyword (e.g., Student, Yes)")
+        
+        display_df = df[cols] if cols else df
+        
+        if search:
+            mask = display_df.apply(lambda x: x.astype(str).str.contains(search, case=False)).any(axis=1)
+            display_df = display_df[mask]
+            
+        st.dataframe(display_df, use_container_width=True, height=500)
+        
+        # Download Button
+        csv = display_df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="📥 Download Filtered Data",
+            data=csv,
+            file_name="ai_impact_data_export.csv",
+            mime="text/csv",
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
 
 else:
-    st.error("❌ Data file not found. Please ensure the CSV is uploaded correctly.")
+    st.error("⚠️ DATA CONNECTION ERROR: Please ensure 'cleaned_ai_impact_data_updated.csv' is in the directory.")
