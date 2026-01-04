@@ -120,15 +120,31 @@ def load_and_clean_data():
             continue
     
     if df is not None:
-        # Strip whitespace from column names just in case
+        # Strip whitespace from column names
         df.columns = df.columns.str.strip()
         
-        # Strip whitespace from all string columns to ensure 'Yes ' becomes 'Yes'
+        # --- FIX: RENAME COLUMNS TO MATCH CODE ---
+        # Maps CSV column names (underscores) to Code column names (spaces)
+        rename_mapping = {
+            'Age_Range': 'Age Range',
+            'Employment_Status': 'Employment Status',
+            'AI_Knowledge': 'AI Knowledge',
+            'AI_Trust': 'Trust in AI',
+            'AI_Usage_Scale': 'AI Usage Rating',
+            'Education': 'Education Level',
+            'Future_AI_Usage': 'Future AI Interest',
+            'Eliminate_Jobs': 'AI Job Impact',      # Mapped for "Yes/No" logic
+            'Threaten_Freedoms': 'AI Impact Perception' # Mapped for sentiment analysis
+        }
+        df.rename(columns=rename_mapping, inplace=True)
+        
+        # Clean string columns
         for col in df.select_dtypes(include=['object']).columns:
             df[col] = df[col].astype(str).str.strip()
             
         if 'ID' in df.columns:
             df.drop('ID', axis=1, inplace=True)
+            
     return df
 
 @st.cache_resource
@@ -181,33 +197,53 @@ if df is not None:
         c1, c2, c3, c4 = st.columns(4)
         c1.metric("📋 Total Responses", len(df), delta="+12 this week")
         c2.metric("🧠 Avg AI Knowledge", "Moderate", delta="↑ 15%")
-        c3.metric("⭐ Avg Usage Score", f"{df['AI Usage Rating'].mean():.1f}/5", delta="+0.3")
-        c4.metric("🎓 Top Education", df['Education Level'].mode()[0][:15] + "...")
+        
+        # Error handling if columns are missing
+        if 'AI Usage Rating' in df.columns:
+            avg_usage = f"{df['AI Usage Rating'].mean():.1f}/5"
+        else:
+            avg_usage = "N/A"
+        c3.metric("⭐ Avg Usage Score", avg_usage, delta="+0.3")
+        
+        if 'Education Level' in df.columns:
+            top_edu = df['Education Level'].mode()[0][:15] + "..."
+        else:
+            top_edu = "N/A"
+        c4.metric("🎓 Top Education", top_edu)
 
         st.divider()
 
         col1, col2 = st.columns(2)
         with col1:
             st.subheader("📊 Distribution of Age Ranges")
-            fig_age = px.histogram(df, x='Age Range', color='Age Range', 
-                                   template="plotly_dark",
-                                   color_discrete_sequence=px.colors.qualitative.Bold)
-            fig_age.update_layout(showlegend=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-            st.plotly_chart(fig_age, use_container_width=True)
+            if 'Age Range' in df.columns:
+                fig_age = px.histogram(df, x='Age Range', color='Age Range', 
+                                       template="plotly_dark",
+                                       color_discrete_sequence=px.colors.qualitative.Bold)
+                fig_age.update_layout(showlegend=False, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+                st.plotly_chart(fig_age, use_container_width=True)
+            else:
+                st.error("Column 'Age Range' not found.")
 
         with col2:
             st.subheader("🤝 Trust in AI vs. AI Knowledge")
-            fig_trust_know = px.histogram(df, x='AI Knowledge', color='Trust in AI', barmode='group',
-                                          template="plotly_dark", 
-                                          color_discrete_sequence=px.colors.qualitative.Vivid)
-            fig_trust_know.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-            st.plotly_chart(fig_trust_know, use_container_width=True)
+            if 'AI Knowledge' in df.columns and 'Trust in AI' in df.columns:
+                fig_trust_know = px.histogram(df, x='AI Knowledge', color='Trust in AI', barmode='group',
+                                              template="plotly_dark", 
+                                              color_discrete_sequence=px.colors.qualitative.Vivid)
+                fig_trust_know.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+                st.plotly_chart(fig_trust_know, use_container_width=True)
+            else:
+                st.error("Columns for Trust/Knowledge not found.")
 
         # Additional Overview Stats
         st.markdown("<br>", unsafe_allow_html=True)
         col_a, col_b, col_c = st.columns(3)
         with col_a:
-            trust_pct = (df['Trust in AI'].value_counts(normalize=True).iloc[0] * 100)
+            if 'Trust in AI' in df.columns:
+                trust_pct = (df['Trust in AI'].value_counts(normalize=True).iloc[0] * 100)
+            else:
+                trust_pct = 0
             st.markdown(f"""
                 <div class='model-comparison'>
                     <h3 style='color: #10b981;'>✅ Trust Rate</h3>
@@ -217,7 +253,10 @@ if df is not None:
             """, unsafe_allow_html=True)
         
         with col_b:
-            future_interest = (df['Future AI Interest'].value_counts(normalize=True).iloc[0] * 100)
+            if 'Future AI Interest' in df.columns:
+                future_interest = (df['Future AI Interest'].value_counts(normalize=True).iloc[0] * 100)
+            else:
+                future_interest = 0
             st.markdown(f"""
                 <div class='model-comparison'>
                     <h3 style='color: #3b82f6;'>🚀 Future Interest</h3>
@@ -227,8 +266,11 @@ if df is not None:
             """, unsafe_allow_html=True)
         
         with col_c:
-            job_concern_count = len(df[df['AI Job Impact'].astype(str).str.lower() == 'yes'])
-            job_concern_pct = (job_concern_count / len(df)) * 100
+            if 'AI Job Impact' in df.columns:
+                job_concern_count = len(df[df['AI Job Impact'].astype(str).str.lower() == 'yes'])
+                job_concern_pct = (job_concern_count / len(df)) * 100
+            else:
+                job_concern_pct = 0
             
             st.markdown(f"""
                 <div class='model-comparison'>
@@ -245,29 +287,34 @@ if df is not None:
         col_a, col_b = st.columns(2)
         with col_a:
             st.subheader("🌍 Perceived Impact on Humanity")
-            impact_data = df['AI Impact Perception'].value_counts().reset_index()
-            fig_impact = px.bar(impact_data, 
-                               y='AI Impact Perception', x='count', orientation='h',
-                               template="plotly_dark", color='AI Impact Perception',
-                               color_discrete_sequence=px.colors.sequential.Viridis)
-            fig_impact.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-            st.plotly_chart(fig_impact, use_container_width=True)
+            if 'AI Impact Perception' in df.columns:
+                impact_data = df['AI Impact Perception'].value_counts().reset_index()
+                fig_impact = px.bar(impact_data, 
+                                   y='AI Impact Perception', x='count', orientation='h',
+                                   template="plotly_dark", color='AI Impact Perception',
+                                   color_discrete_sequence=px.colors.sequential.Viridis)
+                fig_impact.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+                st.plotly_chart(fig_impact, use_container_width=True)
+            else:
+                st.error("Column 'AI Impact Perception' not found.")
 
         with col_b:
             st.subheader("💼 AI Job Impact by Education")
-            fig_job = px.histogram(df, x='Education Level', color='AI Job Impact', barmode='group',
-                                   template="plotly_dark",
-                                   color_discrete_sequence=px.colors.qualitative.Safe)
-            fig_job.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-            st.plotly_chart(fig_job, use_container_width=True)
+            if 'Education Level' in df.columns and 'AI Job Impact' in df.columns:
+                fig_job = px.histogram(df, x='Education Level', color='AI Job Impact', barmode='group',
+                                       template="plotly_dark",
+                                       color_discrete_sequence=px.colors.qualitative.Safe)
+                fig_job.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+                st.plotly_chart(fig_job, use_container_width=True)
 
         st.divider()
         st.subheader("📈 AI Usage Rating vs. Trust in AI")
-        fig_usage_trust = px.box(df, x='Trust in AI', y='AI Usage Rating', color='Trust in AI',
-                                 template="plotly_dark", points="all",
-                                 color_discrete_sequence=px.colors.qualitative.Prism)
-        fig_usage_trust.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-        st.plotly_chart(fig_usage_trust, use_container_width=True)
+        if 'Trust in AI' in df.columns and 'AI Usage Rating' in df.columns:
+            fig_usage_trust = px.box(df, x='Trust in AI', y='AI Usage Rating', color='Trust in AI',
+                                     template="plotly_dark", points="all",
+                                     color_discrete_sequence=px.colors.qualitative.Prism)
+            fig_usage_trust.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+            st.plotly_chart(fig_usage_trust, use_container_width=True)
 
         # Correlation Heatmap
         st.divider()
@@ -282,21 +329,22 @@ if df is not None:
                     corr_df[col + '_encoded'] = le.fit_transform(corr_df[col].astype(str))
             
             correlation_cols = [c for c in corr_df.columns if '_encoded' in c or c == 'AI Usage Rating']
-            corr_matrix = corr_df[correlation_cols].corr()
-            
-            fig_corr = go.Figure(data=go.Heatmap(
-                z=corr_matrix.values,
-                x=[c.replace('_encoded', '') for c in corr_matrix.columns],
-                y=[c.replace('_encoded', '') for c in corr_matrix.index],
-                colorscale='Viridis',
-                text=corr_matrix.values,
-                texttemplate='%{text:.2f}',
-                textfont={"size": 10}
-            ))
-            fig_corr.update_layout(template="plotly_dark", height=500,
-                                   plot_bgcolor='rgba(0,0,0,0)', 
-                                   paper_bgcolor='rgba(0,0,0,0)')
-            st.plotly_chart(fig_corr, use_container_width=True)
+            if correlation_cols:
+                corr_matrix = corr_df[correlation_cols].corr()
+                
+                fig_corr = go.Figure(data=go.Heatmap(
+                    z=corr_matrix.values,
+                    x=[c.replace('_encoded', '') for c in corr_matrix.columns],
+                    y=[c.replace('_encoded', '') for c in corr_matrix.index],
+                    colorscale='Viridis',
+                    text=corr_matrix.values,
+                    texttemplate='%{text:.2f}',
+                    textfont={"size": 10}
+                ))
+                fig_corr.update_layout(template="plotly_dark", height=500,
+                                       plot_bgcolor='rgba(0,0,0,0)', 
+                                       paper_bgcolor='rgba(0,0,0,0)')
+                st.plotly_chart(fig_corr, use_container_width=True)
 
     elif menu == "🔮 Prediction Lab":
         st.markdown("<h1 style='text-align: center;'>🔮 AI Prediction Lab</h1>", unsafe_allow_html=True)
