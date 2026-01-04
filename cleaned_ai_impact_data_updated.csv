@@ -1,0 +1,206 @@
+Age_Range,Gender,Education,Employment_Status,AI_Knowledge,AI_Trust,AI_Usage_Scale,Future_AI_Usage,Threaten_Freedoms,Eliminate_Jobs,Job_Affected,Ethical_Limits,AI_Consciousness,Not_AI_App,ML_Algorithm_Knowledge,ChatGPT_Type
+18-24,Male,Bachelor's Degree,Student,I have a good level of knowledge,I'm undecided,4,I would like to,Agree,Yes,I definitely think,I'm undecided,Yes,WhatsApp,Game algorithm,Web browser
+18-24,Female,Bachelor's Degree,Student,I have basic knowledge,I don't trust it,3,I'm undecided,Agree,Undecided,I'm undecided,Agree,Yes,WhatsApp,HTML,Web browser
+18-24,Male,Bachelor's Degree,Student,I have a good level of knowledge,I'm undecided,3,I would like to,Agree,Yes,I'm undecided,Agree,No,WhatsApp,Linear regression,Natural language processing
+18-24,Male,Bachelor's Degree,Student,I have basic knowledge,I'm undecided,2,I would like to,I'm undecided,Yes,Think,Agree,Undecided,WhatsApp,HTML,Web browser
+18-24,Male,Associate Degree,Student,I've heard a little about it,I'm undecided,1,I would like to,Agree,Yes,I'm undecided,Agree,Undecided,WhatsApp,I do not know,Web browser
+18-24,Female,Bachelor's Degree,Student,I have basic knowledge,I don't trust it,3,I would like to,Strongly disagree,Can't handle it,I don't think so,Strongly Agree,No,WhatsApp,Linear regression,Natural language processing
+18-24,Male,High School,Student,I have basic knowledge,I'm undecided,2,I would like to,I'm undecided,Yes,I'm undecided,Strongly Agree,No,WhatsApp,I do not know,Natural language processing
+18-24,Male,High School,Student,I have a good level of knowledge,I'm undecided,1,I would like to,Agree,Yes,I'm undecided,Agree,No,WhatsApp,Linear regression,Web browser
+Under 18 years old,Male,High School,Student,I have basic knowledge,I trust it,3,I'm undecided,I'm undecided,Yes,Definitely I don't think so,Agree,No,WhatsApp,HTML,Image processing
+Under 18 years old,Female,Primary Education,Student,I've heard a little about it,I trust it,4,I would like to,I disagree,Yes,I'm undecided,Agree,No,I do not know,I do not know,Web browser
+Under 18 years old,Female,Primary Education,Student,I've heard a little about it,I don't trust it at all,1,I would not like to,Strongly Agree,Yes,I don't think so,I'm undecided,Yes,Netflix recommendations,I do not know,Web browser
+18-24,Male,Bachelor's Degree,Student,I have a good level of knowledge,I trust it,4,"Definitely, I would like to",I'm undecided,Yes,I definitely think,Strongly Agree,Yes,WhatsApp,Linear regression,Natural language processing
+Under 18 years old,Female,Primary Education,Student,I've heard a little about it,I don't trust it at all,1,I would not like to,Agree,Yes,Definitely I don't think so,Agree,Yes,Netflix recommendations,I do not know,Web browser
+Under 18 years old,Female,Primary Education,Student,I have a good level of knowledge,I'm undecided,1,I would like to,Agree,Yes,Definitely I don't think so,Agree,Yes,Netflix recommendations,I do not know,Web browser
+Under 18 years old,Female,High School,Student,I have basic knowledge,I'm undecided,3,I would like to,Agree,Yes,I'm undecided,Strongly Agree,Yes,Netflix recommendations,I do not know,Web browser
+18-24,Male,Bachelor's Degree,Student,I have a good level of knowledge,I don't trust it,4,I would like to,Agree,Yes,Think,Agree,Yes,WhatsApp,Linear regression,Natural language processing
+35-44,Male,Bachelor's Degree,Employed,I have a good level of knowledge,I trust it,3,I would like to,I'm undecided,Can't handle it,Think,Agree,No,WhatsApp,I do not know,Natural language processing
+35-44,Female,Primary Education,Unemployed,I have no knowledge,I'm undecided,2,"Definitely, I would not like to",I'm undecided,Yes,Definitely I don't think so,Agree,No,I do not know,I do not know,I do not know
+18-24,Male,Associate Degree,Student,I have basic knowledge,I trust it,4,I'm undecided,I'm undecided,Undecided,Definitely I don't think so,I'm undecided,Undecided,I do not know,I do not know,Image processing
+45 years and older,Male,High School,Employed,I've heard a little about it,I don't trust it at all,1,I would not like to,Strongly disagree,Yes,I don't think so,Strongly Agree,Yes,WhatsApp,Excel,I do not know
+18-24,Male,Bachelor's Degree,Student,I have a good level of knowledge,I trust it,3,I would like to,I disagree,Yes,I don't think so,Agree,Yes,WhatsApp,Linear regression,Natural language processing
+18-24,Male,High School,Employed,I have basic knowledge,I'm undecided,2,I would like to,Strongly disagree,Yes,I don't think so,Agree,Yes,WhatsApp,Linear regression,Web browser
+35-44,Female,Primary Education,Unemployed,I've heard a little about it,I trust it,1,I would not like to,Strongly Agree,Yes,I'm undecided,Agree,Undecided,Netflix recommendations,I do not know,Natural language processing
+35-44,Female,Primary Education,Unemployed,I have no knowledge,I'm undecided,4,I'm undecided,I'm undecided,Undecided,I'm undecided,I'm undecided,Undecided,Netflix recommendations,I do not know,I do not know
+35-44,Female,Primary Education,Unemployed,I have no knowledge,I'm undecided,4,I'm undecided,I'm undecided,Undecided,I'm undecided,I'm undecided,Undecided,Netflix recommendations,I do not know,I do not know
+35-44,Female,Primary Education,Unemployed,I have basic knowledge,I'm undecided,3,I'm undecided,I'm undecided,Undecided,I'm undecided,I'm undecided,Undecided,Siri,Game algorithm,Image processing
+Under 18 years old,Male,High School,Student,I've heard a little about it,I'm undecided,2,I would like to,I'm undecided,Yes,I'm undecided,I'm undecided,Yes,Netflix recommendations,I do not know,Web browser
+Under 18 years old,Male,Primary Education,Student,I've heard a little about it,I trust it,5,I would like to,Agree,Undecided,Think,Agree,Yes,Netflix recommendations,I do not know,I do not know
+35-44,Male,High School,Employed,I have basic knowledge,I don't trust it at all,1,"Definitely, I would not like to",Strongly disagree,No,I definitely think,Strongly Agree,No,I do not know,I do not know,I do not know
+35-44,Female,Primary Education,Unemployed,I've heard a little about it,I'm undecided,2,I'm undecided,I'm undecided,Yes,I'm undecided,Agree,Yes,I do not know,I do not know,I do not know
+18-24,Female,High School,Employed,I've heard a little about it,I'm undecided,1,I'm undecided,I disagree,Undecided,I don't think so,I disagree,No,Netflix recommendations,I do not know,I do not know
+Under 18 years old,Female,High School,Student,I have basic knowledge,I don't trust it,1,I would not like to,Agree,Yes,I'm undecided,Agree,Yes,Netflix recommendations,I do not know,Web browser
+18-24,Male,Associate Degree,Student,I have basic knowledge,I'm undecided,2,I'm undecided,Agree,Yes,Think,Strongly Agree,Yes,Netflix recommendations,I do not know,Natural language processing
+Under 18 years old,Male,High School,Student,I have basic knowledge,I trust it,3,"Definitely, I would like to",Strongly disagree,Can't handle it,Definitely I don't think so,Strongly disagree,Yes,WhatsApp,I do not know,Web browser
+18-24,Male,Associate Degree,Student,I have basic knowledge,I don't trust it,2,I'm undecided,I disagree,No,Definitely I don't think so,Strongly Agree,No,WhatsApp,Linear regression,Natural language processing
+18-24,Male,Bachelor's Degree,Student,I have a good level of knowledge,I'm undecided,3,I'm undecided,I'm undecided,Yes,I don't think so,Agree,No,WhatsApp,HTML,Web browser
+18-24,Male,Associate Degree,Student,I have basic knowledge,I'm undecided,3,I'm undecided,Agree,Yes,I don't think so,Agree,Undecided,WhatsApp,I do not know,Web browser
+35-44,Female,Associate Degree,Unemployed,I've heard a little about it,I don't trust it,1,I'm undecided,I'm undecided,Yes,I don't think so,Agree,Yes,WhatsApp,I do not know,Oyun geliþtirme
+35-44,Male,Primary Education,Employed,I've heard a little about it,I don't trust it,2,I would like to,Strongly disagree,Yes,I don't think so,Strongly Agree,Undecided,I do not know,I do not know,I do not know
+45 years and older,Female,Primary Education,Unemployed,I've heard a little about it,I'm undecided,5,I would not like to,I disagree,Yes,Think,Strongly Agree,Undecided,Netflix recommendations,I do not know,Image processing
+35-44,Female,Associate Degree,Unemployed,I have basic knowledge,I don't trust it,1,I'm undecided,Agree,Yes,I'm undecided,Agree,No,WhatsApp,Game algorithm,Image processing
+35-44,Male,High School,Employed,I've heard a little about it,I don't trust it at all,1,I'm undecided,I'm undecided,Yes,I don't think so,I'm undecided,No,WhatsApp,Game algorithm,Image processing
+18-24,Male,Bachelor's Degree,Student,I have basic knowledge,I trust it,3,I'm undecided,Agree,Yes,I definitely think,Agree,Yes,WhatsApp,HTML,Natural language processing
+35-44,Female,Bachelor's Degree,Unemployed,I have basic knowledge,I'm undecided,1,I would not like to,Agree,Yes,I definitely think,Strongly Agree,Undecided,WhatsApp,I do not know,Natural language processing
+18-24,Male,Bachelor's Degree,Student,I have basic knowledge,I don't trust it,5,I'm undecided,Strongly Agree,Yes,I definitely think,Strongly Agree,Yes,WhatsApp,Linear regression,Natural language processing
+25-34,Male,Associate Degree,Employed,I have basic knowledge,I trust it,2,I would like to,I disagree,Yes,Think,I'm undecided,No,WhatsApp,Linear regression,Web browser
+18-24,Female,Bachelor's Degree,Student,I have basic knowledge,I trust it,4,I would like to,I disagree,Yes,I don't think so,Agree,Undecided,WhatsApp,Linear regression,Natural language processing
+18-24,Male,Bachelor's Degree,Student,I've heard a little about it,I don't trust it at all,3,I'm undecided,Agree,Undecided,I'm undecided,Agree,Yes,WhatsApp,Game algorithm,I do not know
+35-44,Female,Bachelor's Degree,Employed,I have a good level of knowledge,I trust it,4,I would like to,I disagree,Yes,Think,Strongly Agree,Yes,WhatsApp,Linear regression,Natural language processing
+18-24,Male,Bachelor's Degree,Employed,I have a good level of knowledge,I'm undecided,4,I would like to,Strongly Agree,Yes,I don't think so,Agree,Yes,I do not know,HTML,Natural language processing
+18-24,Female,Associate Degree,Student,I have no knowledge,I don't trust it at all,1,I'm undecided,I disagree,Undecided,I'm undecided,I'm undecided,Yes,WhatsApp,I do not know,Image processing
+18-24,Male,Bachelor's Degree,Student,I have basic knowledge,I trust it,3,I would like to,I'm undecided,Undecided,I'm undecided,I'm undecided,Undecided,Netflix recommendations,Excel,Natural language processing
+18-24,Male,Bachelor's Degree,Student,I have basic knowledge,I'm undecided,4,I'm undecided,I'm undecided,Yes,I'm undecided,Agree,Undecided,WhatsApp,Linear regression,Natural language processing
+18-24,Male,Bachelor's Degree,Student,I have basic knowledge,I'm undecided,3,I'm undecided,Agree,Yes,Think,Agree,No,WhatsApp,Linear regression,Natural language processing
+18-24,Male,Bachelor's Degree,Student,I have basic knowledge,I'm undecided,5,I would like to,I'm undecided,Yes,Think,Agree,No,WhatsApp,Linear regression,Natural language processing
+18-24,Male,High School,Student,I have basic knowledge,I'm undecided,3,I would like to,I'm undecided,Yes,Think,I'm undecided,No,WhatsApp,Linear regression,Natural language processing
+18-24,Male,Bachelor's Degree,Student,I have a good level of knowledge,I trust it,3,"Definitely, I would like to",I'm undecided,Yes,Think,Agree,Undecided,Netflix recommendations,Linear regression,Web browser
+18-24,Male,Bachelor's Degree,Student,I have a good level of knowledge,I trust it,4,I would like to,Strongly disagree,Yes,I definitely think,Agree,No,WhatsApp,Linear regression,Web browser
+18-24,Male,Bachelor's Degree,Student,I have basic knowledge,I'm undecided,3,I'm undecided,I disagree,Yes,Think,Agree,No,WhatsApp,I do not know,Natural language processing
+18-24,Male,Bachelor's Degree,Student,I have basic knowledge,I'm undecided,1,I would like to,Agree,Yes,Think,Strongly Agree,No,Netflix recommendations,Game algorithm,Natural language processing
+18-24,Male,Bachelor's Degree,Student,I have basic knowledge,I don't trust it at all,4,I would like to,Agree,Undecided,Definitely I don't think so,I'm undecided,No,Netflix recommendations,Game algorithm,Natural language processing
+18-24,Female,Bachelor's Degree,Student,I have basic knowledge,I'm undecided,5,I would like to,Agree,Yes,I'm undecided,Strongly Agree,Yes,I do not know,Excel,I do not know
+18-24,Female,Bachelor's Degree,Student,I have basic knowledge,I'm undecided,3,I would like to,I'm undecided,Yes,I'm undecided,Agree,Yes,WhatsApp,I do not know,Web browser
+18-24,Female,Bachelor's Degree,Student,I have basic knowledge,I'm undecided,4,I would like to,I'm undecided,Yes,I don't think so,I'm undecided,Yes,WhatsApp,I do not know,Web browser
+18-24,Female,Bachelor's Degree,Student,I have basic knowledge,I don't trust it,3,I would like to,I'm undecided,Yes,Think,Agree,Yes,WhatsApp,I do not know,Web browser
+18-24,Female,Bachelor's Degree,Student,I have basic knowledge,I'm undecided,3,I would like to,I'm undecided,Undecided,I don't think so,Agree,No,WhatsApp,HTML,Web browser
+18-24,Female,Bachelor's Degree,Student,I have a good level of knowledge,I trust it,5,"Definitely, I would like to",I'm undecided,Yes,Think,Strongly Agree,Yes,WhatsApp,I do not know,Web browser
+18-24,Female,Bachelor's Degree,Student,I have basic knowledge,I trust it,3,I'm undecided,I'm undecided,Undecided,I'm undecided,I'm undecided,Undecided,WhatsApp,I do not know,Web browser
+18-24,Female,Bachelor's Degree,Student,I have basic knowledge,I trust it,4,I'm undecided,I'm undecided,Yes,Think,Agree,Undecided,WhatsApp,HTML,Image processing
+18-24,Female,Bachelor's Degree,Student,I have an expert-level knowledge,I trust it,3,"Definitely, I would not like to",Strongly disagree,Yes,Think,I disagree,No,I do not know,Linear regression,Natural language processing
+18-24,Female,High School,Student,I've heard a little about it,I'm undecided,4,I would like to,Agree,Can't handle it,Think,Strongly Agree,No,WhatsApp,HTML,Web browser
+18-24,Female,Bachelor's Degree,Student,I have a good level of knowledge,I trust it,5,"Definitely, I would like to",I disagree,Yes,I don't think so,I disagree,Yes,WhatsApp,Linear regression,Natural language processing
+45 years and older,Female,Bachelor's Degree,Employed,I've heard a little about it,I don't trust it,1,I'm undecided,Agree,Yes,I don't think so,Strongly Agree,Yes,WhatsApp,Linear regression,Web browser
+45 years and older,Male,Master's/PhD,Employed,I have basic knowledge,I don't trust it at all,1,I would not like to,Agree,Yes,I don't think so,Strongly Agree,Yes,WhatsApp,I do not know,Web browser
+45 years and older,Male,Bachelor's Degree,Employed,I've heard a little about it,I trust it,3,I would like to,Agree,Yes,Think,Strongly Agree,Yes,WhatsApp,I do not know,I do not know
+45 years and older,Male,Bachelor's Degree,Employed,I have basic knowledge,I trust it,1,"Definitely, I would not like to",Strongly Agree,Yes,I don't think so,Agree,No,I do not know,I do not know,Image processing
+45 years and older,Male,Bachelor's Degree,Employed,I have basic knowledge,I'm undecided,1,I would like to,Agree,Yes,Definitely I don't think so,Strongly Agree,No,WhatsApp,I do not know,Web browser
+Under 18 years old,Female,High School,Student,I have basic knowledge,I trust it,4,I'm undecided,Agree,Yes,Think,Agree,Yes,WhatsApp,I do not know,Web browser
+35-44,Female,Associate Degree,Employed,I've heard a little about it,I'm undecided,3,I'm undecided,I'm undecided,Undecided,I'm undecided,I'm undecided,Undecided,WhatsApp,I do not know,Image processing
+25-34,Female,Bachelor's Degree,Employed,I have basic knowledge,I'm undecided,3,I'm undecided,Agree,Can't handle it,I definitely think,Strongly Agree,Undecided,WhatsApp,Game algorithm,I do not know
+18-24,Female,Bachelor's Degree,Student,I have basic knowledge,I'm undecided,3,I would like to,Agree,Yes,I definitely think,Strongly Agree,Undecided,WhatsApp,Linear regression,Natural language processing
+45 years and older,Male,Bachelor's Degree,Retired,I've heard a little about it,I trust it,1,"Definitely, I would like to",Strongly Agree,Yes,Think,Strongly Agree,Undecided,WhatsApp,Excel,Natural language processing
+45 years and older,Male,Bachelor's Degree,Employed,I have basic knowledge,I don't trust it at all,1,I would not like to,Agree,Can't handle it,Definitely I don't think so,Strongly Agree,No,WhatsApp,Linear regression,Web browser
+18-24,Female,Bachelor's Degree,Student,I have a good level of knowledge,I trust it,3,I would like to,I'm undecided,Yes,Think,Strongly Agree,Undecided,Netflix recommendations,Excel,Web browser
+45 years and older,Male,Primary Education,Employed,I have a good level of knowledge,I trust it,2,I'm undecided,Strongly disagree,Yes,Think,Strongly Agree,Yes,WhatsApp,HTML,Web browser
+45 years and older,Male,Bachelor's Degree,Employed,I have basic knowledge,I'm undecided,1,I would like to,Agree,Yes,Think,Agree,No,WhatsApp,Game algorithm,I do not know
+35-44,Female,High School,Unemployed,I have basic knowledge,I don't trust it at all,1,I would not like to,Agree,Yes,Think,I'm undecided,Yes,WhatsApp,I do not know,I do not know
+45 years and older,Male,Bachelor's Degree,Employed,I have basic knowledge,I don't trust it,3,I would like to,Agree,Yes,Think,Agree,Yes,WhatsApp,Excel,Image processing
+45 years and older,Male,Bachelor's Degree,Employed,I have a good level of knowledge,I don't trust it,5,I'm undecided,I'm undecided,Yes,I don't think so,Agree,Undecided,WhatsApp,I do not know,I do not know
+25-34,Male,Bachelor's Degree,Employed,I have basic knowledge,I trust it,2,I would like to,I'm undecided,Yes,I don't think so,I'm undecided,Yes,WhatsApp,Game algorithm,Natural language processing
+45 years and older,Male,Bachelor's Degree,Retired,I have basic knowledge,I don't trust it,2,I would not like to,I disagree,Yes,I don't think so,Strongly Agree,No,Netflix recommendations,I do not know,Natural language processing
+45 years and older,Male,Bachelor's Degree,Employed,I have basic knowledge,I trust it,1,I would like to,I'm undecided,Yes,Think,Agree,Undecided,WhatsApp,Linear regression,Natural language processing
+45 years and older,Male,Master's/PhD,Employed,I have a good level of knowledge,I trust it,4,"Definitely, I would like to",I disagree,Yes,Think,Strongly disagree,Yes,WhatsApp,I do not know,Web browser
+35-44,Female,Master's/PhD,Employed,I have a good level of knowledge,I trust it,2,I would like to,I'm undecided,Yes,Think,Strongly Agree,Undecided,WhatsApp,Linear regression,Web browser
+35-44,Female,High School,Employed,I've heard a little about it,I don't trust it,1,I would like to,I'm undecided,Yes,Think,I'm undecided,No,Netflix recommendations,I do not know,I do not know
+45 years and older,Male,Bachelor's Degree,Employed,I've heard a little about it,I trust it,2,I would like to,I'm undecided,Undecided,Think,I'm undecided,Yes,I do not know,I do not know,I do not know
+18-24,Female,High School,Student,I have a good level of knowledge,I trust it,5,I would like to,I disagree,Can't handle it,I don't think so,Agree,No,WhatsApp,Linear regression,Natural language processing
+35-44,Male,Bachelor's Degree,Employed,I have basic knowledge,I trust it,1,"Definitely, I would not like to",I disagree,Yes,Think,Agree,No,WhatsApp,Game algorithm,Image processing
+45 years and older,Male,Master's/PhD,Employed,I have basic knowledge,I'm undecided,3,I'm undecided,Strongly disagree,Can't handle it,Think,Strongly Agree,Yes,WhatsApp,I do not know,I do not know
+25-34,Male,Bachelor's Degree,Employed,I have a good level of knowledge,I trust it,2,I would like to,Agree,Yes,Think,Agree,Undecided,WhatsApp,Linear regression,Natural language processing
+25-34,Male,Master's/PhD,Employed,I have a good level of knowledge,I trust it,3,I would like to,I disagree,Yes,I don't think so,Agree,No,WhatsApp,HTML,Natural language processing
+45 years and older,Female,High School,Retired,I've heard a little about it,I don't trust it,1,I would not like to,Agree,Undecided,Definitely I don't think so,Agree,No,Netflix recommendations,I do not know,Natural language processing
+45 years and older,Female,Bachelor's Degree,Employed,I have basic knowledge,I'm undecided,2,I would like to,I'm undecided,Yes,Think,Strongly Agree,Yes,WhatsApp,Linear regression,Natural language processing
+45 years and older,Female,Bachelor's Degree,Employed,I've heard a little about it,I'm undecided,1,I'm undecided,Agree,Yes,I'm undecided,Strongly Agree,Yes,I do not know,I do not know,Natural language processing
+45 years and older,Female,Master's/PhD,Employed,I have basic knowledge,I'm undecided,2,I would not like to,Agree,Yes,I'm undecided,Strongly Agree,Yes,WhatsApp,Excel,Web browser
+35-44,Female,Master's/PhD,Employed,I have basic knowledge,I'm undecided,2,I would like to,Agree,Yes,Think,Strongly Agree,No,WhatsApp,Game algorithm,Natural language processing
+35-44,Male,Bachelor's Degree,Employed,I've heard a little about it,I don't trust it,1,I would like to,Agree,Yes,Think,Agree,Yes,WhatsApp,I do not know,I do not know
+45 years and older,Male,Bachelor's Degree,Employed,I have basic knowledge,I don't trust it,3,I'm undecided,Strongly disagree,Yes,Think,Agree,Yes,WhatsApp,I do not know,Natural language processing
+45 years and older,Female,Master's/PhD,Employed,I have basic knowledge,I don't trust it,3,I'm undecided,Agree,Yes,Think,Agree,Undecided,WhatsApp,Game algorithm,Web browser
+35-44,Female,Bachelor's Degree,Employed,I have basic knowledge,I don't trust it,1,I'm undecided,Strongly Agree,Yes,I don't think so,Strongly Agree,No,WhatsApp,I do not know,Natural language processing
+45 years and older,Male,Master's/PhD,Employed,I've heard a little about it,I'm undecided,2,I would like to,I'm undecided,Yes,Think,Strongly Agree,Yes,Netflix recommendations,I do not know,Web browser
+45 years and older,Male,Bachelor's Degree,Employed,I have basic knowledge,I don't trust it,3,I'm undecided,Agree,Yes,Think,Strongly Agree,Yes,WhatsApp,Linear regression,Web browser
+25-34,Female,Bachelor's Degree,Employed,I've heard a little about it,I don't trust it,2,I'm undecided,Agree,Yes,I don't think so,Strongly Agree,No,WhatsApp,I do not know,Web browser
+45 years and older,Female,Master's/PhD,Employed,I have basic knowledge,I'm undecided,1,I'm undecided,I'm undecided,Undecided,I don't think so,Strongly Agree,Yes,WhatsApp,Game algorithm,Web browser
+45 years and older,Male,Master's/PhD,Employed,I have basic knowledge,I don't trust it,2,I would not like to,Strongly Agree,Yes,I don't think so,Strongly Agree,Yes,WhatsApp,Game algorithm,Web browser
+Under 18 years old,Female,High School,Employed,I have basic knowledge,I'm undecided,3,I'm undecided,Agree,Yes,I'm undecided,Agree,Yes,WhatsApp,Game algorithm,Web browser
+25-34,Female,Bachelor's Degree,Employed,I have basic knowledge,I don't trust it,1,I'm undecided,Agree,Yes,I don't think so,Agree,Undecided,WhatsApp,Game algorithm,Web browser
+25-34,Female,Bachelor's Degree,Employed,I've heard a little about it,I don't trust it,1,I'm undecided,Agree,Yes,I don't think so,Agree,Yes,WhatsApp,I do not know,Natural language processing
+35-44,Female,High School,Employed,I have basic knowledge,I trust it,2,I'm undecided,I'm undecided,Yes,I don't think so,I'm undecided,No,WhatsApp,I do not know,Web browser
+35-44,Female,Bachelor's Degree,Employed,I have basic knowledge,I trust it,3,I would like to,Agree,Yes,I don't think so,Strongly Agree,No,WhatsApp,Game algorithm,I do not know
+45 years and older,Male,High School,Employed,I've heard a little about it,I'm undecided,1,I'm undecided,I'm undecided,Yes,I don't think so,Strongly Agree,Yes,I do not know,I do not know,Image processing
+25-34,Male,Bachelor's Degree,Employed,I have basic knowledge,I don't trust it,3,I would like to,I'm undecided,No,I don't think so,Agree,Undecided,WhatsApp,Excel,Web browser
+45 years and older,Male,Bachelor's Degree,Employed,I've heard a little about it,I'm undecided,2,I would like to,Agree,Yes,Think,Agree,Yes,WhatsApp,Game algorithm,Oyun geliþtirme
+45 years and older,Female,Bachelor's Degree,Employed,I have basic knowledge,I'm undecided,1,I would not like to,Agree,Yes,Think,Agree,Yes,I do not know,I do not know,I do not know
+25-34,Male,Associate Degree,Employed,I have a good level of knowledge,I fully trust it,1,I would like to,I disagree,Yes,Think,Agree,Yes,WhatsApp,Linear regression,Natural language processing
+25-34,Female,Bachelor's Degree,Employed,I have basic knowledge,I'm undecided,4,I would like to,Agree,Yes,Think,Agree,Undecided,WhatsApp,I do not know,I do not know
+25-34,Female,Bachelor's Degree,Employed,I have basic knowledge,I don't trust it,1,I'm undecided,Agree,Yes,I definitely think,Agree,Yes,WhatsApp,Game algorithm,Natural language processing
+25-34,Female,Bachelor's Degree,Employed,I have basic knowledge,I don't trust it at all,1,I would not like to,Strongly Agree,Yes,Think,Agree,No,WhatsApp,Game algorithm,Image processing
+45 years and older,Female,Bachelor's Degree,Employed,I have basic knowledge,I'm undecided,2,I'm undecided,Agree,Yes,I definitely think,I'm undecided,No,Netflix recommendations,I do not know,I do not know
+25-34,Female,Bachelor's Degree,Employed,I have a good level of knowledge,I trust it,3,"Definitely, I would like to",I disagree,Can't handle it,Definitely I don't think so,Strongly Agree,No,WhatsApp,HTML,I do not know
+45 years and older,Female,Master's/PhD,Employed,I have basic knowledge,I trust it,1,I'm undecided,Agree,Yes,Think,Strongly Agree,Undecided,WhatsApp,Game algorithm,Web browser
+35-44,Female,Master's/PhD,Employed,I have no knowledge,I'm undecided,2,I would not like to,I'm undecided,No,Definitely I don't think so,Strongly Agree,No,Netflix recommendations,I do not know,Web browser
+45 years and older,Female,Bachelor's Degree,Employed,I have basic knowledge,I don't trust it,1,I'm undecided,Agree,Yes,I'm undecided,Agree,Yes,WhatsApp,I do not know,Natural language processing
+35-44,Female,Master's/PhD,Employed,I have basic knowledge,I don't trust it,2,I would not like to,I'm undecided,Yes,Think,Strongly Agree,Yes,WhatsApp,Game algorithm,Web browser
+45 years and older,Female,Bachelor's Degree,Employed,I have basic knowledge,I'm undecided,3,I'm undecided,Agree,Yes,Think,Agree,Yes,Netflix recommendations,I do not know,Natural language processing
+45 years and older,Male,Bachelor's Degree,Employed,I have basic knowledge,I don't trust it,2,I'm undecided,Agree,Yes,I don't think so,Agree,No,Netflix recommendations,Game algorithm,Web browser
+25-34,Female,Bachelor's Degree,Employed,I have basic knowledge,I'm undecided,1,I'm undecided,Agree,Yes,Think,Strongly Agree,Undecided,WhatsApp,Game algorithm,Web browser
+18-24,Male,Bachelor's Degree,Student,I have basic knowledge,I don't trust it,2,I'm undecided,I'm undecided,Yes,I'm undecided,Agree,Yes,WhatsApp,HTML,Natural language processing
+45 years and older,Male,Bachelor's Degree,Employed,I have basic knowledge,I'm undecided,2,I would like to,Agree,Yes,I'm undecided,Agree,No,Netflix recommendations,HTML,Image processing
+18-24,Male,Bachelor's Degree,Student,I have basic knowledge,I'm undecided,3,I would like to,I'm undecided,Yes,Think,Agree,Yes,WhatsApp,Linear regression,I do not know
+45 years and older,Female,Bachelor's Degree,Employed,I have basic knowledge,I trust it,3,I would like to,Agree,Yes,Think,Strongly Agree,No,WhatsApp,Game algorithm,Web browser
+45 years and older,Male,Bachelor's Degree,Employed,I've heard a little about it,I trust it,1,I would like to,Strongly disagree,Yes,Definitely I don't think so,Strongly Agree,Yes,WhatsApp,I do not know,I do not know
+18-24,Female,Bachelor's Degree,Student,I have basic knowledge,I'm undecided,2,I'm undecided,Agree,Yes,Think,Strongly Agree,Yes,WhatsApp,Linear regression,Web browser
+18-24,Male,Bachelor's Degree,Student,I have basic knowledge,I trust it,4,I'm undecided,Agree,Yes,I don't think so,Agree,No,Netflix recommendations,I do not know,Web browser
+18-24,Female,Bachelor's Degree,Student,I have a good level of knowledge,I trust it,4,"Definitely, I would like to",I disagree,Yes,I definitely think,Agree,Yes,WhatsApp,I do not know,Oyun geliþtirme
+45 years and older,Female,Master's/PhD,Retired,I've heard a little about it,I'm undecided,1,I'm undecided,I disagree,Yes,Think,Agree,Yes,WhatsApp,I do not know,Web browser
+18-24,Male,Bachelor's Degree,Student,I have basic knowledge,I'm undecided,3,I'm undecided,I disagree,No,Definitely I don't think so,I disagree,No,ChatGPT,HTML,Image processing
+18-24,Male,Bachelor's Degree,Student,I have basic knowledge,I'm undecided,1,"Definitely, I would not like to",Strongly disagree,Yes,Definitely I don't think so,I'm undecided,Undecided,WhatsApp,Linear regression,Natural language processing
+45 years and older,Female,Primary Education,Unemployed,I have no knowledge,I'm undecided,1,"Definitely, I would not like to",Strongly Agree,Undecided,I don't think so,Agree,Undecided,I do not know,I do not know,I do not know
+Under 18 years old,Female,High School,Student,I have basic knowledge,I'm undecided,3,I would like to,Agree,Yes,Think,Agree,No,WhatsApp,I do not know,Web browser
+45 years and older,Female,Associate Degree,Unemployed,I have no knowledge,I'm undecided,1,I would like to,Agree,Yes,I don't think so,Agree,Yes,I do not know,I do not know,I do not know
+18-24,Male,Bachelor's Degree,Student,I have basic knowledge,I trust it,2,I would not like to,I disagree,Yes,I don't think so,I'm undecided,No,WhatsApp,Linear regression,Natural language processing
+45 years and older,Female,Bachelor's Degree,Employed,I have basic knowledge,I'm undecided,1,I'm undecided,Agree,Yes,Think,Agree,No,WhatsApp,Game algorithm,Web browser
+25-34,Female,Bachelor's Degree,Employed,I have basic knowledge,I trust it,3,I would like to,Strongly Agree,Yes,I definitely think,Strongly Agree,Yes,WhatsApp,HTML,Web browser
+18-24,Male,High School,Student,I have basic knowledge,I'm undecided,2,I'm undecided,I'm undecided,Yes,I don't think so,Strongly Agree,Yes,Netflix recommendations,Game algorithm,Natural language processing
+18-24,Female,Bachelor's Degree,Student,I have a good level of knowledge,I trust it,2,I'm undecided,I'm undecided,Can't handle it,I don't think so,Agree,No,WhatsApp,Linear regression,Natural language processing
+35-44,Male,Bachelor's Degree,Employed,I have basic knowledge,I'm undecided,1,I would like to,Agree,Yes,Think,Strongly Agree,Yes,I do not know,I do not know,Natural language processing
+18-24,Female,Associate Degree,Unemployed,I've heard a little about it,I'm undecided,2,I'm undecided,I'm undecided,Yes,I'm undecided,Agree,Undecided,WhatsApp,Excel,Natural language processing
+18-24,Male,Bachelor's Degree,Student,I have basic knowledge,I trust it,1,I would like to,Strongly disagree,Can't handle it,Think,I disagree,No,I do not know,Excel,Web browser
+35-44,Female,Bachelor's Degree,Employed,I have basic knowledge,I'm undecided,3,I would like to,I'm undecided,Yes,I'm undecided,Agree,No,WhatsApp,Game algorithm,Web browser
+45 years and older,Female,High School,Retired,I have basic knowledge,I fully trust it,3,I'm undecided,I'm undecided,Undecided,I'm undecided,I'm undecided,Yes,I do not know,I do not know,I do not know
+25-34,Male,Associate Degree,Employed,I've heard a little about it,I'm undecided,1,I would like to,I'm undecided,Yes,I'm undecided,Strongly Agree,Yes,Netflix recommendations,I do not know,Web browser
+18-24,Female,High School,Student,I have a good level of knowledge,I'm undecided,3,I would like to,I'm undecided,Yes,Think,Strongly Agree,Yes,WhatsApp,Linear regression,Natural language processing
+Under 18 years old,Female,High School,Student,I have a good level of knowledge,I'm undecided,4,I'm undecided,Agree,Yes,I'm undecided,I disagree,Yes,WhatsApp,Linear regression,Web browser
+18-24,Female,Associate Degree,Unemployed,I have a good level of knowledge,I'm undecided,3,I would like to,I disagree,Yes,Think,Agree,Undecided,WhatsApp,I do not know,I do not know
+Under 18 years old,Female,High School,Student,I have basic knowledge,I'm undecided,4,I would like to,I'm undecided,No,I don't think so,I disagree,Yes,I do not know,Game algorithm,Web browser
+Under 18 years old,Female,High School,Student,I have a good level of knowledge,I'm undecided,2,I would like to,Agree,Yes,I'm undecided,I'm undecided,Undecided,WhatsApp,HTML,Web browser
+Under 18 years old,Male,High School,Student,I've heard a little about it,I don't trust it at all,1,"Definitely, I would not like to",Agree,Yes,Definitely I don't think so,Strongly Agree,Undecided,Netflix recommendations,I do not know,Natural language processing
+Under 18 years old,Male,High School,Student,I have a good level of knowledge,I'm undecided,2,I'm undecided,I'm undecided,Yes,Definitely I don't think so,I disagree,Yes,WhatsApp,Game algorithm,Web browser
+Under 18 years old,Female,High School,Student,I have a good level of knowledge,I'm undecided,3,I would like to,Agree,Can't handle it,I'm undecided,I'm undecided,No,WhatsApp,I do not know,Oyun geliþtirme
+Under 18 years old,Female,High School,Student,I've heard a little about it,I'm undecided,2,I would not like to,Strongly Agree,Yes,Think,Strongly Agree,Yes,Netflix recommendations,Excel,Web browser
+Under 18 years old,Female,High School,Student,I have basic knowledge,I'm undecided,3,I'm undecided,I'm undecided,Undecided,Think,I'm undecided,Undecided,I do not know,I do not know,I do not know
+Under 18 years old,Female,High School,Student,I have basic knowledge,I'm undecided,3,I would like to,I'm undecided,Yes,Think,Agree,No,Netflix recommendations,Game algorithm,Natural language processing
+35-44,Female,Master's/PhD,Employed,I have basic knowledge,I'm undecided,1,I would like to,Agree,Yes,Think,Strongly Agree,Undecided,WhatsApp,Linear regression,Web browser
+Under 18 years old,Male,High School,Student,I have basic knowledge,I'm undecided,3,I'm undecided,I disagree,Undecided,I'm undecided,Agree,No,WhatsApp,Linear regression,Web browser
+35-44,Male,Bachelor's Degree,Employed,I have a good level of knowledge,I trust it,3,I would like to,Agree,Yes,I definitely think,Strongly Agree,Yes,Netflix recommendations,Game algorithm,Natural language processing
+Under 18 years old,Female,High School,Student,I have basic knowledge,I'm undecided,4,I would like to,Agree,Can't handle it,Think,Agree,Yes,WhatsApp,HTML,Web browser
+Under 18 years old,Female,High School,Student,I have basic knowledge,I trust it,4,"Definitely, I would like to",Agree,Yes,I'm undecided,I'm undecided,Yes,Netflix recommendations,I do not know,I do not know
+35-44,Female,High School,Unemployed,I've heard a little about it,I'm undecided,3,I'm undecided,I'm undecided,Yes,I don't think so,I'm undecided,Yes,WhatsApp,I do not know,Image processing
+Under 18 years old,Female,High School,Student,I have basic knowledge,I'm undecided,1,I'm undecided,Agree,Yes,Think,I'm undecided,No,WhatsApp,HTML,Image processing
+18-24,Female,High School,Student,I've heard a little about it,I'm undecided,3,I would like to,I'm undecided,Yes,I'm undecided,Agree,Undecided,WhatsApp,Excel,Web browser
+Under 18 years old,Female,High School,Student,I have basic knowledge,I'm undecided,3,I'm undecided,I'm undecided,Yes,Think,I disagree,Yes,Netflix recommendations,Excel,Web browser
+35-44,Male,Master's/PhD,Employed,I have basic knowledge,I don't trust it at all,2,I'm undecided,Agree,Yes,Think,Strongly Agree,Yes,WhatsApp,Game algorithm,Web browser
+35-44,Male,Bachelor's Degree,Employed,I've heard a little about it,I don't trust it,1,I'm undecided,Agree,Yes,Think,Strongly Agree,Yes,WhatsApp,I do not know,I do not know
+Under 18 years old,Female,High School,Student,I have basic knowledge,I trust it,3,I would like to,I disagree,Can't handle it,Think,Agree,Yes,WhatsApp,I do not know,Natural language processing
+Under 18 years old,Female,High School,Student,I've heard a little about it,I'm undecided,2,I would like to,Agree,Yes,I'm undecided,Agree,Yes,WhatsApp,Linear regression,Web browser
+Under 18 years old,Female,High School,Student,I've heard a little about it,I'm undecided,3,I'm undecided,Agree,Yes,Definitely I don't think so,Strongly Agree,Yes,I do not know,I do not know,Web browser
+45 years and older,Female,Bachelor's Degree,Employed,I have basic knowledge,I trust it,2,I would like to,I'm undecided,Yes,I don't think so,Agree,No,Netflix recommendations,I do not know,Web browser
+Under 18 years old,Female,High School,Student,I have no knowledge,I don't trust it,1,I would not like to,I'm undecided,Yes,I'm undecided,Agree,Yes,WhatsApp,HTML,Web browser
+Under 18 years old,Female,High School,Student,I've heard a little about it,I'm undecided,3,I would not like to,Strongly Agree,Yes,I'm undecided,Strongly Agree,Yes,WhatsApp,I do not know,Web browser
+Under 18 years old,Female,High School,Student,I've heard a little about it,I'm undecided,1,"Definitely, I would like to",I disagree,Yes,Definitely I don't think so,Strongly Agree,Yes,Netflix recommendations,HTML,Web browser
+25-34,Male,Bachelor's Degree,Employed,I have basic knowledge,I don't trust it,1,I would not like to,Agree,Can't handle it,Definitely I don't think so,Agree,No,WhatsApp,Linear regression,Web browser
+Under 18 years old,Female,High School,Student,I've heard a little about it,I'm undecided,3,I would not like to,Agree,Yes,I don't think so,Agree,No,Netflix recommendations,I do not know,Web browser
+Under 18 years old,Female,High School,Student,I have basic knowledge,I'm undecided,2,I'm undecided,I disagree,Yes,Think,Agree,No,I do not know,I do not know,Natural language processing
+18-24,Female,Bachelor's Degree,Student,I've heard a little about it,I don't trust it,3,I'm undecided,Agree,Yes,Think,Strongly Agree,Yes,WhatsApp,I do not know,I do not know
+35-44,Female,High School,Unemployed,I have basic knowledge,I'm undecided,2,I'm undecided,I'm undecided,Undecided,I'm undecided,I'm undecided,Undecided,Netflix recommendations,I do not know,Natural language processing
+45 years and older,Female,High School,Retired,I've heard a little about it,I'm undecided,1,I'm undecided,I'm undecided,Undecided,I'm undecided,I'm undecided,Undecided,WhatsApp,I do not know,I do not know
+45 years and older,Male,Bachelor's Degree,Employed,I've heard a little about it,I'm undecided,1,I would like to,Agree,No,Think,Agree,No,WhatsApp,HTML,I do not know
+18-24,Female,High School,Student,I have basic knowledge,I fully trust it,4,"Definitely, I would like to",Strongly disagree,Yes,Think,Agree,No,WhatsApp,Excel,Web browser
+Under 18 years old,Female,High School,Student,I have basic knowledge,I trust it,3,I would like to,I'm undecided,Yes,Think,I'm undecided,Undecided,WhatsApp,I do not know,Web browser
+Under 18 years old,Female,High School,Student,I have basic knowledge,I trust it,4,I would like to,I'm undecided,Yes,I don't think so,Strongly Agree,No,Netflix recommendations,Excel,Web browser
+45 years and older,Male,Bachelor's Degree,Employed,I have basic knowledge,I don't trust it,1,I would like to,Strongly Agree,Yes,Think,Strongly Agree,Undecided,WhatsApp,Linear regression,Natural language processing
+45 years and older,Male,Bachelor's Degree,Employed,I have basic knowledge,I trust it,4,I would like to,Agree,Yes,Think,Strongly Agree,No,WhatsApp,Linear regression,Web browser
+25-34,Male,Master's/PhD,Employed,I have an expert-level knowledge,I trust it,5,"Definitely, I would like to",Strongly disagree,Yes,I definitely think,Agree,No,WhatsApp,Linear regression,Natural language processing
+Under 18 years old,Female,Primary Education,Student,I have a good level of knowledge,I don't trust it at all,2,I'm undecided,I'm undecided,Undecided,I'm undecided,I'm undecided,No,Netflix recommendations,Excel,Web browser
