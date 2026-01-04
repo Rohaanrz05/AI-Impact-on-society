@@ -7,447 +7,387 @@ from xgboost import XGBClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-import base64
+import numpy as np
 
 # --- PAGE CONFIG ---
 st.set_page_config(
-    page_title="AI Impact | Ultra Dashboard",
-    layout="wide",
+    page_title="AI Nexus | Ultra Dashboard", 
+    layout="wide", 
     page_icon="🤖",
     initial_sidebar_state="expanded"
 )
 
-# --- 🎨 ULTRA-MODERN CSS THEME ---
+# --- 🎨 ULTRA CSS THEME (Pretty & Clean) ---
 st.markdown("""
     <style>
-    /* IMPORT FONTS */
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400&display=swap');
     
-    /* GLOBAL VARIABLES */
     :root {
         --primary: #6366f1;
         --secondary: #8b5cf6;
         --accent: #ec4899;
-        --bg-dark: #0f172a;
-        --glass-bg: rgba(30, 41, 59, 0.7);
-        --glass-border: rgba(255, 255, 255, 0.1);
-        --text-white: #f8fafc;
+        --bg-dark: #0a0e17;
+        --card-bg: rgba(30, 41, 59, 0.4);
+        --text-highlight: #38bdf8;
     }
 
-    /* APP BACKGROUND & TYPOGRAPHY */
+    /* APP BACKGROUND */
     .stApp {
         background-color: var(--bg-dark);
         background-image: 
-            radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-            radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-            radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
-        background-attachment: fixed;
+            radial-gradient(at 10% 10%, rgba(99, 102, 241, 0.15) 0px, transparent 50%), 
+            radial-gradient(at 90% 10%, rgba(236, 72, 153, 0.15) 0px, transparent 50%), 
+            radial-gradient(at 50% 90%, rgba(16, 185, 129, 0.10) 0px, transparent 50%);
         font-family: 'Outfit', sans-serif;
     }
     
-    h1, h2, h3, p, div, span {
-        font-family: 'Outfit', sans-serif !important;
-        color: var(--text-white);
-    }
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.5); border-radius: 10px; }
 
-    /* SIDEBAR STYLING */
-    section[data-testid="stSidebar"] {
-        background: rgba(15, 23, 42, 0.95);
-        backdrop-filter: blur(10px);
-        border-right: 1px solid var(--glass-border);
-    }
-
-    /* 🔮 GLASSMORPHISM CARDS */
+    /* 🔮 GLASS CARDS (Container Design) */
     .glass-card {
-        background: var(--glass-bg);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid var(--glass-border);
-        border-radius: 16px;
-        padding: 24px;
+        background: var(--card-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        padding: 25px;
         margin-bottom: 20px;
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        overflow: hidden;
     }
     
     .glass-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2);
-        border-color: rgba(99, 102, 241, 0.3);
+        border-color: rgba(99, 102, 241, 0.5);
+        box-shadow: 0 15px 30px -10px rgba(99, 102, 241, 0.3);
     }
 
-    /* METRIC CARDS HTML */
-    .metric-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
+    /* METRIC TEXT */
     .metric-value {
-        font-size: 38px;
+        font-size: 2.5rem;
         font-weight: 800;
-        background: -webkit-linear-gradient(45deg, #6366f1, #ec4899);
+        background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
+    
     .metric-label {
-        font-size: 14px;
+        font-size: 0.9rem;
         color: #94a3b8;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 1.5px;
+        font-weight: 600;
+        margin-bottom: 5px;
     }
 
-    /* NEON BUTTONS */
+    /* BUTTONS */
     .stButton > button {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
         color: white;
         border: none;
-        border-radius: 12px;
-        padding: 0.75rem 1.5rem;
-        font-weight: 600;
-        letter-spacing: 0.5px;
+        padding: 0.6rem 2rem;
+        border-radius: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); 
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
         width: 100%;
     }
     
     .stButton > button:hover {
-        transform: scale(1.02);
-        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6);
-    }
-
-    /* CUSTOM RADIO BUTTONS (SIDEBAR) */
-    div[role="radiogroup"] > label {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid transparent;
-        border-radius: 10px;
-        margin-bottom: 8px;
-        padding: 10px 15px;
-        transition: all 0.2s ease;
-    }
-    
-    div[role="radiogroup"] > label:hover {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: var(--primary);
-    }
-    
-    div[role="radiogroup"] label[data-checked="true"] {
-        background: linear-gradient(90deg, rgba(99, 102, 241, 0.2), transparent);
-        border-left: 4px solid var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
     }
 
     /* HEADERS */
+    h1, h2, h3 { color: white !important; font-family: 'Outfit', sans-serif !important; }
+    
     .gradient-text {
-        background: linear-gradient(to right, #818cf8, #e879f9);
+        background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-weight: 800;
     }
-
-    /* SLIDER CUSTOMIZATION */
-    div[data-testid="stSlider"] > div {
-        
-    }
-    
-    /* PREDICTION RESULT BOX */
-    .result-box {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.1));
-        border: 2px solid #10b981;
-        border-radius: 20px;
-        padding: 30px;
-        text-align: center;
-        animation: glow-pulse 3s infinite;
-    }
-    
-    @keyframes glow-pulse {
-        0% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.1); }
-        50% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.4); }
-        100% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.1); }
-    }
-
     </style>
 """, unsafe_allow_html=True)
 
-# --- HELPER: CUSTOM CARD FUNCTION ---
-def card_metric(label, value, subtext="", icon="📊"):
-    st.markdown(f"""
-        <div class="glass-card metric-container">
-            <div style="font-size: 24px; margin-bottom: 5px;">{icon}</div>
-            <div class="metric-value">{value}</div>
-            <div class="metric-label">{label}</div>
-            <div style="font-size: 12px; color: #64748b; margin-top: 5px;">{subtext}</div>
-        </div>
-    """, unsafe_allow_html=True)
-
-# --- DATA LOADING (WITH YOUR FIXED LOGIC) ---
+# --- DATA ENGINE ---
 @st.cache_data
-def load_and_clean_data():
+def get_data():
     file_path = 'cleaned_ai_impact_data_updated.csv'
-    encodings = ['utf-8', 'ISO-8859-1', 'cp1252', 'latin1']
-    df = None
-    for enc in encodings:
+    for enc in ['utf-8', 'ISO-8859-1', 'latin1']:
         try:
             df = pd.read_csv(file_path, encoding=enc)
-            break
+            df.columns = df.columns.str.strip()
+            rename_map = {
+                'Age_Range': 'Age Range', 'Employment_Status': 'Employment Status',
+                'AI_Knowledge': 'AI Knowledge', 'AI_Trust': 'Trust in AI',
+                'AI_Usage_Scale': 'AI Usage Rating', 'Education': 'Education Level',
+                'Future_AI_Usage': 'Future AI Interest', 'Eliminate_Jobs': 'AI Job Impact',
+                'Threaten_Freedoms': 'AI Impact Perception'
+            }
+            df.rename(columns=rename_map, inplace=True)
+            for col in df.select_dtypes(include='object').columns:
+                df[col] = df[col].astype(str).str.strip()
+            return df
         except:
             continue
-    
-    if df is not None:
-        df.columns = df.columns.str.strip()
-        # Mapping
-        rename_mapping = {
-            'Age_Range': 'Age Range',
-            'Employment_Status': 'Employment Status',
-            'AI_Knowledge': 'AI Knowledge',
-            'AI_Trust': 'Trust in AI',
-            'AI_Usage_Scale': 'AI Usage Rating',
-            'Education': 'Education Level',
-            'Future_AI_Usage': 'Future AI Interest',
-            'Eliminate_Jobs': 'AI Job Impact',
-            'Threaten_Freedoms': 'AI Impact Perception'
-        }
-        df.rename(columns=rename_mapping, inplace=True)
-        for col in df.select_dtypes(include=['object']).columns:
-            df[col] = df[col].astype(str).str.strip()
-        if 'ID' in df.columns:
-            df.drop('ID', axis=1, inplace=True)
-    return df
+    return None
 
-# --- ML TRAINING CACHE ---
+# --- ML ENGINE ---
 @st.cache_resource
-def train_models(X, y):
+def build_model(df, target_col, features):
+    ml_df = df[features + [target_col]].dropna()
+    encoders = {}
+    for col in ml_df.columns:
+        le = LabelEncoder()
+        ml_df[col] = le.fit_transform(ml_df[col].astype(str))
+        encoders[col] = le
+    X = ml_df[features]
+    y = ml_df[target_col]
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    rf = RandomForestClassifier(n_estimators=150, max_depth=10, random_state=42).fit(X_train, y_train)
-    xgb = XGBClassifier(n_estimators=150, max_depth=6, learning_rate=0.1, random_state=42).fit(X_train, y_train)
+    rf = RandomForestClassifier(n_estimators=100, max_depth=10).fit(X_train, y_train)
+    xgb = XGBClassifier(eval_metric='logloss').fit(X_train, y_train)
+    acc_rf = accuracy_score(y_test, rf.predict(X_test))
+    acc_xgb = accuracy_score(y_test, xgb.predict(X_test))
+    return rf, xgb, acc_rf, acc_xgb, encoders
+
+df_raw = get_data()
+
+# --- APP LAYOUT ---
+if df_raw is not None:
     
-    rf_acc = accuracy_score(y_test, rf.predict(X_test))
-    xgb_acc = accuracy_score(y_test, xgb.predict(X_test))
-    return rf, xgb, rf_acc, xgb_acc
-
-# --- APP START ---
-df = load_and_clean_data()
-
-if df is not None:
-    # --- SIDEBAR NAV ---
+    # --- SIDEBAR ---
     with st.sidebar:
-        st.markdown("<h2 class='gradient-text'>🤖 AI NEXUS</h2>", unsafe_allow_html=True)
-        st.write("Advanced Social Analytics Node")
+        st.markdown("<h2 style='text-align: center;'>🧬 AI NEXUS</h2>", unsafe_allow_html=True)
         st.markdown("---")
         
-        menu = st.radio("NAVIGATION", 
-            ["Dashboard", "Deep Insights", "Prediction Lab", "Model Arena", "Data Explorer"],
-            label_visibility="collapsed"
-        )
+        page = st.radio("INTERFACE", [
+            "🛸 Command Center", 
+            "🔮 Prediction Lab", 
+            "🧠 Deep Matrix", 
+            "⚡ Model Arena"
+        ])
         
         st.markdown("---")
-        st.markdown("### ⚙️ System Status")
-        st.success("● Models Online")
-        st.info(f"● {len(df)} Records Loaded")
+        st.markdown("### 🎛️ Global Filters")
+        filter_gender = st.multiselect("Gender", df_raw['Gender'].unique(), default=df_raw['Gender'].unique())
+        
+        df = df_raw[df_raw['Gender'].isin(filter_gender)]
+        st.markdown(f"<div style='text-align:center; color:#64748b; margin-top:10px;'>Active Records: {len(df)}</div>", unsafe_allow_html=True)
 
-    # --- MAIN CONTENT ---
-    
-    # 1. DASHBOARD
-    if menu == "Dashboard":
-        st.markdown("<h1 class='gradient-text'>🌐 Global Overview</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='color: #94a3b8;'>Real-time analysis of Artificial Intelligence perception.</p>", unsafe_allow_html=True)
+    # --- PAGE 1: COMMAND CENTER (Dashboard) ---
+    if page == "🛸 Command Center":
+        st.markdown("<h1 class='gradient-text'>🛸 COMMAND CENTER</h1>", unsafe_allow_html=True)
+        st.markdown("<p style='color: #94a3b8;'>Real-time AI perception analytics.</p>", unsafe_allow_html=True)
         
-        # Ultra Metrics
-        c1, c2, c3, c4 = st.columns(4)
-        with c1: card_metric("Total Responses", len(df), "Updated live", "📋")
-        with c2: card_metric("Avg Usage", f"{df['AI Usage Rating'].mean():.1f}/5", "Out of 5.0", "⭐")
-        with c3: card_metric("Trust Factor", f"{(df['Trust in AI'].value_counts(normalize=True).iloc[0]*100):.0f}%", "Trusting Population", "🛡️")
-        with c4: card_metric("Knowledge Base", "Moderate", "Avg. User Level", "🧠")
+        # --- IMPROVED KPI ROW ---
+        # Calculate Job Concern Count
+        if 'AI Job Impact' in df.columns:
+            job_concern_count = df[df['AI Job Impact'].astype(str).str.lower() == 'yes'].shape[0]
+        else:
+            job_concern_count = 0
 
-        st.markdown("<br>", unsafe_allow_html=True)
+        kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+        metrics = [
+            ("Total Records", len(df), "Filtered View"),
+            ("Avg Trust", f"{(df['Trust in AI'].str.contains('trust', case=False).mean()*100):.1f}%", "Trusting Users"),
+            ("Usage Intensity", f"{df['AI Usage Rating'].astype(float).mean():.1f}/5", "Activity Level"),
+            ("Job Concerns", f"{job_concern_count} Users", "Said 'Yes' to Job Loss") # FIXED: Shows Count
+        ]
         
-        # Glass Containers for Charts
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-            st.markdown("### 📊 Demographics: Age")
-            if 'Age Range' in df.columns:
-                fig = px.pie(df, names='Age Range', hole=0.6, color_discrete_sequence=px.colors.qualitative.Pastel)
-                fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font_color="white")
-                st.plotly_chart(fig, use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-
-        with col2:
-            st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-            st.markdown("### 🤝 Trust Distribution")
-            if 'Trust in AI' in df.columns:
-                fig = px.bar(df['Trust in AI'].value_counts(), orientation='h', 
-                             color_discrete_sequence=['#6366f1'])
-                fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font_color="white", showlegend=False)
-                st.plotly_chart(fig, use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-
-    # 2. DEEP INSIGHTS
-    elif menu == "Deep Insights":
-        st.markdown("<h1 class='gradient-text'>🔬 Deep Dive Analytics</h1>", unsafe_allow_html=True)
+        for col, (label, val, sub) in zip([kpi1, kpi2, kpi3, kpi4], metrics):
+            with col:
+                st.markdown(f"""
+                <div class="glass-card" style="text-align: center; padding: 20px;">
+                    <div class="metric-label">{label}</div>
+                    <div class="metric-value">{val}</div>
+                    <div style="color: #64748b; font-size: 0.8rem; margin-top: 5px;">{sub}</div>
+                </div>
+                """, unsafe_allow_html=True)
         
-        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.subheader("🔥 Multi-Variable Correlation Heatmap")
-        
-        # Prepare Heatmap
-        corr_df = df.copy()
-        for col in ['Age Range', 'Gender', 'Education Level', 'Employment Status', 'AI Knowledge', 'Trust in AI']:
-            if col in corr_df.columns:
-                corr_df[col] = LabelEncoder().fit_transform(corr_df[col].astype(str))
-        
-        numeric_cols = corr_df.select_dtypes(include=[int, float]).columns
-        corr = corr_df[numeric_cols].corr()
-        
-        fig = go.Figure(data=go.Heatmap(
-            z=corr.values, x=corr.columns, y=corr.columns,
-            colorscale='Magma', text=corr.values, texttemplate='%{text:.2f}'
-        ))
-        fig.update_layout(height=600, plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font_color="white")
-        st.plotly_chart(fig, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-        
+        # --- SEPARATE GRAPH DESIGNS (2D Only) ---
         c1, c2 = st.columns(2)
+        
         with c1:
             st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-            st.markdown("### 🎓 Education vs Fear of Job Loss")
-            fig2 = px.histogram(df, x="Education Level", color="AI Job Impact", barmode="group",
-                                color_discrete_sequence=px.colors.qualitative.Safe)
-            fig2.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', font_color="white")
-            st.plotly_chart(fig2, use_container_width=True)
+            st.markdown("### 📊 Demographics: Age")
+            # 2D Histogram
+            fig_age = px.histogram(df, x='Age Range', color='Age Range', 
+                                   color_discrete_sequence=px.colors.qualitative.Pastel)
+            fig_age.update_layout(height=350, margin=dict(t=30, l=0, r=0, b=0), 
+                                  paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+                                  showlegend=False, font_color='white')
+            st.plotly_chart(fig_age, use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+            
+        with c2:
+            st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+            st.markdown("### 🤝 Trust Distribution")
+            # 2D Donut Chart
+            fig_trust = px.pie(df, names='Trust in AI', hole=0.5, 
+                               color_discrete_sequence=px.colors.sequential.Bluyl)
+            fig_trust.update_layout(height=350, margin=dict(t=30, l=0, r=0, b=0), 
+                                    paper_bgcolor='rgba(0,0,0,0)', font_color='white')
+            st.plotly_chart(fig_trust, use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
 
-    # 3. PREDICTION LAB
-    elif menu == "Prediction Lab":
-        st.markdown("<h1 class='gradient-text'>🔮 Future Prediction Engine</h1>", unsafe_allow_html=True)
+    # --- PAGE 2: PREDICTION LAB (Perfect ML Mode) ---
+    elif page == "🔮 Prediction Lab":
+        st.markdown("<h1 class='gradient-text'>🔮 PREDICTION LAB</h1>", unsafe_allow_html=True)
         
-        # Setup Data
-        features_emp = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating']
-        ml_df_emp = df[features_emp + ['Employment Status']].dropna()
+        # Configuration
+        col_input, col_result = st.columns([1, 1.5])
         
-        features_trust = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating', 'AI Knowledge']
-        ml_df_trust = df[features_trust + ['Trust in AI']].dropna()
+        with col_input:
+            st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+            st.subheader("👤 User Profile")
+            
+            # Setup Models
+            feats_emp = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating']
+            rf_e, xgb_e, acc_e, acc_xgb_e, enc_e = build_model(df_raw, 'Employment Status', feats_emp)
+            
+            feats_tru = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating', 'AI Knowledge']
+            rf_t, xgb_t, acc_t, acc_xgb_t, enc_t = build_model(df_raw, 'Trust in AI', feats_tru)
+            
+            # Model Selection
+            model_type = st.radio("Select Model Engine", ["⚡ XGBoost (Recommended)", "🌲 Random Forest"])
+            
+            # Inputs
+            u_age = st.selectbox("Age Range", enc_e['Age Range'].classes_)
+            u_gen = st.selectbox("Gender", enc_e['Gender'].classes_)
+            u_edu = st.selectbox("Education", enc_e['Education Level'].classes_)
+            u_use = st.slider("Usage Level (1-5)", 1, 5, 3)
+            u_know = st.select_slider("Knowledge Level", options=enc_t['AI Knowledge'].classes_)
+            
+            btn_predict = st.button("🚀 GENERATE PREDICTION")
+            st.markdown('</div>', unsafe_allow_html=True)
 
-        # Encoders
-        enc_emp = {col: LabelEncoder().fit(ml_df_emp[col].astype(str)) for col in features_emp + ['Employment Status']}
-        enc_trust = {col: LabelEncoder().fit(ml_df_trust[col].astype(str)) for col in features_trust + ['Trust in AI']}
+        with col_result:
+            if btn_predict:
+                # Prepare Inputs
+                in_e = [enc_e[c].transform([val])[0] for c, val in zip(feats_emp, [u_age, u_gen, u_edu, u_use])]
+                in_t = [enc_t[c].transform([val])[0] for c, val in zip(feats_tru, [u_age, u_gen, u_edu, u_use, u_know])]
+                
+                # Logic to pick model
+                if "XGBoost" in model_type:
+                    pred_emp = enc_e['Employment Status'].inverse_transform(xgb_e.predict([in_e]))[0]
+                    conf_emp = acc_xgb_e
+                    pred_tru = enc_t['Trust in AI'].inverse_transform(xgb_t.predict([in_t]))[0]
+                    conf_tru = acc_xgb_t
+                    m_name = "XGBoost"
+                else:
+                    pred_emp = enc_e['Employment Status'].inverse_transform(rf_e.predict([in_e]))[0]
+                    conf_emp = acc_e
+                    pred_tru = enc_t['Trust in AI'].inverse_transform(rf_t.predict([in_t]))[0]
+                    conf_tru = acc_t
+                    m_name = "Random Forest"
 
-        # Prepare X, y
-        for col in features_emp: ml_df_emp[col] = enc_emp[col].transform(ml_df_emp[col].astype(str))
-        ml_df_emp['Employment Status'] = enc_emp['Employment Status'].transform(ml_df_emp['Employment Status'].astype(str))
+                # Dual Result Display
+                st.markdown(f"""
+                <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+                    <div class="glass-card" style="flex: 1; border-color: #10b981; text-align: center;">
+                        <h4 style="color: #10b981; margin: 0;">💼 Employment Status</h4>
+                        <div class="metric-value" style="font-size: 2.2rem; margin: 10px 0;">{pred_emp}</div>
+                        <div style="font-size: 0.9rem; color: #94a3b8;">Confidence: {conf_emp:.1%}</div>
+                    </div>
+                    <div class="glass-card" style="flex: 1; border-color: #ec4899; text-align: center;">
+                        <h4 style="color: #ec4899; margin: 0;">🤝 Trust Level</h4>
+                        <div class="metric-value" style="font-size: 2.2rem; margin: 10px 0;">{pred_tru}</div>
+                        <div style="font-size: 0.9rem; color: #94a3b8;">Confidence: {conf_tru:.1%}</div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                st.info(f"⚡ Predictions generated using **{m_name}** algorithm based on the provided profile.")
+            
+            else:
+                st.markdown("""
+                <div class="glass-card" style="text-align: center; padding: 50px;">
+                    <h3>Ready to Predict</h3>
+                    <p style="color: #94a3b8;">Select parameters on the left and click 'Generate Prediction' to see the dual-model AI analysis.</p>
+                </div>
+                """, unsafe_allow_html=True)
+
+    # --- PAGE 3: DEEP MATRIX (2D Charts Only) ---
+    elif page == "🧠 Deep Matrix":
+        st.markdown("<h1 class='gradient-text'>🧠 DEEP MATRIX</h1>", unsafe_allow_html=True)
         
-        for col in features_trust: ml_df_trust[col] = enc_trust[col].transform(ml_df_trust[col].astype(str))
-        ml_df_trust['Trust in AI'] = enc_trust['Trust in AI'].transform(ml_df_trust['Trust in AI'].astype(str))
-
-        # Train
-        rf_e, xgb_e, _, _ = train_models(ml_df_emp[features_emp], ml_df_emp['Employment Status'])
-        rf_t, xgb_t, _, _ = train_models(ml_df_trust[features_trust], ml_df_trust['Trust in AI'])
-
-        # Input Section
+        # 2D Bubble Chart (Replacing 3D)
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.subheader("👤 Subject Profile")
-        c1, c2, c3 = st.columns(3)
-        age = c1.selectbox("Age Range", enc_emp['Age Range'].classes_)
-        gender = c2.selectbox("Gender", enc_emp['Gender'].classes_)
-        edu = c3.selectbox("Education", enc_emp['Education Level'].classes_)
-        usage = st.slider("AI Usage Intensity", 1, 5, 3)
-        knowledge = st.select_slider("AI Knowledge Level", options=enc_trust['AI Knowledge'].classes_)
+        st.markdown("### 🫧 Age vs Usage Patterns (by Trust)")
+        fig_bubble = px.scatter(
+            df, x='Age Range', y='AI Usage Rating',
+            color='Trust in AI', size='AI Usage Rating', # Bubble size based on usage
+            symbol='Gender',
+            color_discrete_sequence=px.colors.qualitative.Bold,
+            hover_data=['Education Level']
+        )
+        fig_bubble.update_layout(
+            height=500, margin=dict(t=30, l=0, r=0, b=0),
+            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+            font_color='white'
+        )
+        st.plotly_chart(fig_bubble, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
         
-        predict_btn = st.button("🚀 INITIALIZE PREDICTION SEQUENCE")
+        # Heatmap (2D)
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+        st.markdown("### 🔥 Variable Correlation Heatmap")
+        d_corr = df.apply(lambda x: pd.factorize(x)[0])
+        corr = d_corr.corr()
+        fig_h = go.Figure(data=go.Heatmap(
+            z=corr.values, x=corr.columns, y=corr.columns,
+            colorscale='Magma', text=corr.values, texttemplate='%{text:.1f}'
+        ))
+        fig_h.update_layout(height=600, paper_bgcolor='rgba(0,0,0,0)', font_color='white')
+        st.plotly_chart(fig_h, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-        if predict_btn:
-            with st.spinner('⚡ Calculating Probabilities...'):
-                # Prepare Inputs
-                input_emp = [enc_emp[c].transform([val])[0] for c, val in zip(features_emp, [age, gender, edu, usage])]
-                input_trust = [enc_trust[c].transform([val])[0] for c, val in zip(features_trust, [age, gender, edu, usage, knowledge])]
-                
-                # Predict (Using XGBoost as default "Ultra" model)
-                pred_emp = enc_emp['Employment Status'].inverse_transform(xgb_e.predict([input_emp]))[0]
-                pred_trust = enc_trust['Trust in AI'].inverse_transform(xgb_t.predict([input_trust]))[0]
-                
-                st.markdown("<br>", unsafe_allow_html=True)
-                r1, r2 = st.columns(2)
-                
-                with r1:
-                    st.markdown(f"""
-                    <div class="result-box">
-                        <h3 style="color:#60a5fa; margin:0;">💼 Employment Status</h3>
-                        <h1 style="font-size:42px; color:white; margin:10px 0;">{pred_emp}</h1>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with r2:
-                    st.markdown(f"""
-                    <div class="result-box" style="border-color: #f59e0b; box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);">
-                        <h3 style="color:#f59e0b; margin:0;">🤝 Trust Level</h3>
-                        <h1 style="font-size:42px; color:white; margin:10px 0;">{pred_trust}</h1>
-                    </div>
-                    """, unsafe_allow_html=True)
-
-    # 4. MODEL ARENA
-    elif menu == "Model Arena":
-        st.markdown("<h1 class='gradient-text'>⚔️ Model Performance Arena</h1>", unsafe_allow_html=True)
+    # --- PAGE 4: MODEL ARENA ---
+    elif page == "⚡ Model Arena":
+        st.markdown("<h1 class='gradient-text'>⚡ MODEL ARENA</h1>", unsafe_allow_html=True)
         
-        # Simulating data again for quick access
-        features = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating']
-        ml_df = df[features + ['Employment Status']].dropna()
-        le_dict = {c: LabelEncoder().fit(ml_df[c].astype(str)) for c in ml_df.columns}
-        for c in ml_df.columns: ml_df[c] = le_dict[c].transform(ml_df[c].astype(str))
+        target = st.selectbox("Select Target Variable", ["Employment Status", "Trust in AI"])
         
-        rf, xgb, rf_acc, xgb_acc = train_models(ml_df[features], ml_df['Employment Status'])
+        # Quick Train for Comparison
+        feats = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating', 'AI Knowledge'] if target == 'Trust in AI' else ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating']
+        rf, xgb, acc_rf, acc_xgb, _ = build_model(df_raw, target, feats)
         
-        col1, col2 = st.columns(2)
-        with col1:
+        c1, c2 = st.columns(2)
+        
+        with c1:
             st.markdown(f"""
-            <div class="glass-card" style="border-left: 5px solid #10b981;">
-                <h2>🌲 Random Forest</h2>
-                <h1 style="color: #10b981; font-size: 50px;">{rf_acc*100:.2f}%</h1>
+            <div class="glass-card" style="border-top: 4px solid #10b981; text-align: center;">
+                <h3>🌲 Random Forest</h3>
+                <div class="metric-value" style="color: #10b981 !important;">{acc_rf:.1%}</div>
                 <p>Accuracy Score</p>
             </div>
             """, unsafe_allow_html=True)
             
-        with col2:
+        with c2:
             st.markdown(f"""
-            <div class="glass-card" style="border-left: 5px solid #3b82f6;">
-                <h2>⚡ XGBoost</h2>
-                <h1 style="color: #3b82f6; font-size: 50px;">{xgb_acc*100:.2f}%</h1>
+            <div class="glass-card" style="border-top: 4px solid #3b82f6; text-align: center;">
+                <h3>⚡ XGBoost</h3>
+                <div class="metric-value" style="color: #3b82f6 !important;">{acc_xgb:.1%}</div>
                 <p>Accuracy Score</p>
             </div>
             """, unsafe_allow_html=True)
             
-        # Feature Importance
-        st.markdown("### 🧠 Feature Importance Architecture")
-        imp = pd.DataFrame({'Feature': features, 'Importance': xgb.feature_importances_}).sort_values('Importance', ascending=True)
-        fig = px.bar(imp, x='Importance', y='Feature', orientation='h', template="plotly_dark",
-                     color='Importance', color_continuous_scale='Viridis')
-        fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
-        st.plotly_chart(fig, use_container_width=True)
-
-    # 5. DATA EXPLORER (New Feature)
-    elif menu == "Data Explorer":
-        st.markdown("<h1 class='gradient-text'>💾 Raw Data Vault</h1>", unsafe_allow_html=True)
+        # Comparison Bar Chart
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        
-        with st.expander("🔎 Filter & Search Options", expanded=True):
-            cols = st.multiselect("Select Columns to View", df.columns.tolist(), default=df.columns[:5].tolist())
-            search = st.text_input("Search Keyword (e.g., Student, Yes)")
-        
-        display_df = df[cols] if cols else df
-        
-        if search:
-            mask = display_df.apply(lambda x: x.astype(str).str.contains(search, case=False)).any(axis=1)
-            display_df = display_df[mask]
-            
-        st.dataframe(display_df, use_container_width=True, height=500)
-        
-        # Download Button
-        csv = display_df.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="📥 Download Filtered Data",
-            data=csv,
-            file_name="ai_impact_data_export.csv",
-            mime="text/csv",
-        )
+        st.markdown("### 🏆 Performance Comparison")
+        comp_df = pd.DataFrame({'Model': ['Random Forest', 'XGBoost'], 'Accuracy': [acc_rf, acc_xgb]})
+        fig_comp = px.bar(comp_df, x='Model', y='Accuracy', color='Model', 
+                          color_discrete_sequence=['#10b981', '#3b82f6'], text_auto='.1%')
+        fig_comp.update_layout(height=400, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color='white')
+        st.plotly_chart(fig_comp, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
 else:
-    st.error("⚠️ DATA CONNECTION ERROR: Please ensure 'cleaned_ai_impact_data_updated.csv' is in the directory.")
+    st.error("🚨 CRITICAL ERROR: Database Connection Failed. Please ensure 'cleaned_ai_impact_data_updated.csv' is in the root directory.")
