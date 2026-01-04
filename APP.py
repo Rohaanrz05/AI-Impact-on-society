@@ -123,8 +123,30 @@ st.markdown("""
     }
 
     /* CUSTOM TABS */
-    div[data-testid="stRadio"] > div {
-        background: transparent;
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 20px;
+        background-color: transparent;
+        padding: 10px 0;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        height: 55px;
+        white-space: pre-wrap;
+        background-color: rgba(30, 41, 59, 0.5);
+        border-radius: 12px;
+        color: #94a3b8;
+        font-weight: 700;
+        font-size: 1rem;
+        border: 1px solid rgba(255,255,255,0.05);
+        padding: 0 25px;
+        transition: all 0.3s ease;
+    }
+
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2)) !important;
+        color: #fff !important;
+        border: 1px solid #6366f1 !important;
+        box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
     }
     
     /* PLOTLY CHART CONTAINER */
@@ -209,20 +231,10 @@ df_raw = get_dataset()
 
 if df_raw is not None:
     
-    # --- SIDEBAR ---
+    # --- SIDEBAR (FILTERS ONLY) ---
     with st.sidebar:
         st.markdown("<h2 style='text-align: center; color: #8b5cf6; margin-bottom: 0;'>🧬 AI NEXUS</h2>", unsafe_allow_html=True)
         st.markdown("<p style='text-align: center; color: #64748b; font-size: 0.8rem;'>INTELLIGENCE SYSTEM</p>", unsafe_allow_html=True)
-        st.markdown("---")
-        
-        # NAV
-        page = st.radio("MAIN INTERFACE", [
-            "🛸 Command Center", 
-            "🧠 Deep Matrix",
-            "🔮 Prediction Lab", 
-            "⚡ Model Arena"
-        ])
-        
         st.markdown("---")
         st.markdown("### 🎛️ Global Filters")
         
@@ -243,10 +255,19 @@ if df_raw is not None:
         </div>
         """, unsafe_allow_html=True)
 
+    # --- TOP NAVIGATION ---
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "🛸 Command Center", 
+        "🧠 Deep Matrix",
+        "🔮 Prediction Lab", 
+        "⚡ Model Arena"
+    ])
+
     # ==========================================
     # TAB 1: COMMAND CENTER (Dashboard)
     # ==========================================
-    if page == "🛸 Command Center":
+    with tab1:
+        st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("<h1 class='gradient-text'>COMMAND CENTER</h1>", unsafe_allow_html=True)
         st.markdown("<p style='color: #94a3b8; margin-top: -10px;'>Real-time AI perception analytics & key performance indicators.</p>", unsafe_allow_html=True)
         
@@ -305,7 +326,8 @@ if df_raw is not None:
     # ==========================================
     # TAB 2: DEEP MATRIX (Insights)
     # ==========================================
-    elif page == "🧠 Deep Matrix":
+    with tab2:
+        st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("<h1 class='gradient-text'>DEEP MATRIX</h1>", unsafe_allow_html=True)
         st.markdown("<p style='color: #94a3b8; margin-top: -10px;'>Advanced correlation analysis and behavioral patterns.</p>", unsafe_allow_html=True)
         st.write("")
@@ -354,7 +376,8 @@ if df_raw is not None:
     # ==========================================
     # TAB 3: PREDICTION LAB
     # ==========================================
-    elif page == "🔮 Prediction Lab":
+    with tab3:
+        st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("<h1 class='gradient-text'>PREDICTION LAB</h1>", unsafe_allow_html=True)
         st.write("")
 
@@ -426,7 +449,8 @@ if df_raw is not None:
     # ==========================================
     # TAB 4: MODEL ARENA
     # ==========================================
-    elif page == "⚡ Model Arena":
+    with tab4:
+        st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("<h1 class='gradient-text'>MODEL ARENA</h1>", unsafe_allow_html=True)
         st.markdown("<p style='color: #94a3b8; margin-top: -10px;'>Head-to-head comparison of ML algorithms.</p>", unsafe_allow_html=True)
         st.write("")
