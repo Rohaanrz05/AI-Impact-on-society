@@ -109,7 +109,8 @@ st.markdown("""
 
 @st.cache_data
 def load_and_clean_data():
-    file_path = 'The impact of artificial intelligence on society.csv'
+    # UPDATED: Pointing to your cleaned file
+    file_path = 'cleaned_ai_impact_data_updated.csv'
     encodings = ['utf-8', 'ISO-8859-1', 'cp1252', 'latin1']
     df = None
     for enc in encodings:
@@ -120,23 +121,9 @@ def load_and_clean_data():
             continue
     
     if df is not None:
-        new_columns = {
-            'What is your age range?': 'Age Range',
-            'What is your gender?': 'Gender',
-            'What is your education level?': 'Education Level',
-            'What is your employment status?': 'Employment Status',
-            'How much knowledge do you have about artificial intelligence (AI) technologies?': 'AI Knowledge',
-            'Do you generally trust artificial intelligence (AI)?': 'Trust in AI',
-            'Do you think artificial intelligence (AI) will be generally beneficial or harmful to humanity?': 'AI Impact Perception',
-            'Please rate how actively you use AI-powered products in your daily life on a scale from 1 to 5.': 'AI Usage Rating',
-            'Would you like to use more AI products in the future?': 'Future AI Interest',
-            'Do you think your own job could be affected by artificial intelligence (AI)?': 'AI Job Impact'
-        }
-        df.rename(columns=new_columns, inplace=True)
-        # Strip whitespace from column names
+        # Strip whitespace from column names just in case
         df.columns = df.columns.str.strip()
         
-        # --- FIX FOR 0% JOB CONCERN ---
         # Strip whitespace from all string columns to ensure 'Yes ' becomes 'Yes'
         for col in df.select_dtypes(include=['object']).columns:
             df[col] = df[col].astype(str).str.strip()
@@ -241,7 +228,6 @@ if df is not None:
             """, unsafe_allow_html=True)
         
         with col_c:
-            # FIX: Ensure we match 'Yes' correctly after stripping whitespace
             job_concern_count = len(df[df['AI Job Impact'].astype(str).str.lower() == 'yes'])
             job_concern_pct = (job_concern_count / len(df)) * 100
             
@@ -361,7 +347,6 @@ if df is not None:
         X_trust = ml_df_trust[features_trust]
         y_trust = ml_df_trust[target_trust]
         
-        # --- FIX FOR NAME ERROR ---
         # Train models UNCONDITIONALLY so they exist regardless of user selection
         rf_model_emp, xgb_model_emp, rf_acc_emp, xgb_acc_emp, _, _ = train_models(X_emp, y_emp, "employment")
         rf_model_trust, xgb_model_trust, rf_acc_trust, xgb_acc_trust, _, _ = train_models(X_trust, y_trust, "trust")
