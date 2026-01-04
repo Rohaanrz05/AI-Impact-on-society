@@ -738,3 +738,4 @@ if df is not None:
 
 else:
     st.error("❌ Data file not found. Please ensure the CSV is uploaded correctly.")
+
