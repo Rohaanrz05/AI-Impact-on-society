@@ -373,8 +373,8 @@ if df_raw is not None:
         st.plotly_chart(fig_bar, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # ==========================================
-    # TAB 3: PREDICTION LAB
+# ==========================================
+    # TAB 3: PREDICTION LAB (UPDATED)
     # ==========================================
     with tab3:
         st.markdown("<br>", unsafe_allow_html=True)
@@ -387,11 +387,12 @@ if df_raw is not None:
             st.markdown('<div class="glass-card">', unsafe_allow_html=True)
             st.subheader("👤 Subject Profile")
             
-            # Init Models
+            # --- UPDATED FEATURE LISTS ---
             feats_emp = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating']
             rf_e, xgb_e, acc_e, acc_xgb_e, enc_e = build_model(df_raw, 'Employment Status', feats_emp)
             
-            feats_tru = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating', 'AI Knowledge']
+            # ADDED 'AI Impact Perception' AND 'Future AI Interest' HERE
+            feats_tru = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating', 'AI Knowledge', 'AI Impact Perception', 'Future AI Interest']
             rf_t, xgb_t, acc_t, acc_xgb_t, enc_t = build_model(df_raw, 'Trust in AI', feats_tru)
             
             # Inputs
@@ -404,6 +405,12 @@ if df_raw is not None:
             u_use = st.slider("Usage Intensity", 1, 5, 3)
             u_know = st.select_slider("Knowledge Level", options=enc_t['AI Knowledge'].classes_)
             
+            # --- NEW INPUTS FOR ACCURACY BOOST ---
+            st.markdown("---")
+            st.markdown("**🧠 Psychology Factors**")
+            u_perc = st.selectbox("Perception of Impact", enc_t['AI Impact Perception'].classes_)
+            u_fut = st.selectbox("Future Interest", enc_t['Future AI Interest'].classes_)
+            
             run = st.button("🚀 Run Prediction Analysis")
             st.markdown('</div>', unsafe_allow_html=True)
 
@@ -411,7 +418,9 @@ if df_raw is not None:
             if run:
                 # Prepare Safe Inputs
                 in_e = [safe_transform(enc_e[c], val) for c, val in zip(feats_emp, [u_age, u_gen, u_edu, u_use])]
-                in_t = [safe_transform(enc_t[c], val) for c, val in zip(feats_tru, [u_age, u_gen, u_edu, u_use, u_know])]
+                
+                # UPDATE INPUT LIST WITH NEW FEATURES
+                in_t = [safe_transform(enc_t[c], val) for c, val in zip(feats_tru, [u_age, u_gen, u_edu, u_use, u_know, u_perc, u_fut])]
                 
                 if "XGBoost" in model_choice:
                     pred_emp = enc_e['Employment Status'].inverse_transform(xgb_e.predict([in_e]))[0]
@@ -437,7 +446,7 @@ if df_raw is not None:
                     <div class="glass-card" style="flex: 1; text-align: center; border-top: 4px solid #ec4899;">
                         <h4 style="color: #ec4899; margin: 0;">🤝 Trust Level</h4>
                         <div class="metric-value" style="font-size: 2.5rem; margin: 15px 0;">{pred_tru}</div>
-                        <div style="color: #94a3b8;">Accuracy: {conf_tru:.1%}</div>
+                        <div style="color: #94a3b8;">Accuracy: {conf_tru:.1%} <span style="font-size:0.8rem; color:#10b981;">(Boosted)</span></div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -446,19 +455,25 @@ if df_raw is not None:
             else:
                 st.info("👈 Enter profile details and click 'Run Prediction Analysis'")
 
-    # ==========================================
-    # TAB 4: MODEL ARENA
+# ==========================================
+    # TAB 4: MODEL ARENA (UPDATED)
     # ==========================================
     with tab4:
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("<h1 class='gradient-text'>MODEL ARENA</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='color: #94a3b8; margin-top: -10px;'>Head-to-head comparison of ML algorithms.</p>", unsafe_allow_html=True)
         st.write("")
 
         target = st.selectbox("Select Target Variable", ["Employment Status", "Trust in AI"])
         
-        feats = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating', 'AI Knowledge'] if target == 'Trust in AI' else ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating']
+        # LOGIC UPDATE: Include the new features when 'Trust in AI' is selected
+        if target == 'Trust in AI':
+            feats = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating', 'AI Knowledge', 'AI Impact Perception', 'Future AI Interest']
+        else:
+            feats = ['Age Range', 'Gender', 'Education Level', 'AI Usage Rating']
+            
         rf, xgb, acc_rf, acc_xgb, _ = build_model(df_raw, target, feats)
+        
+        # ... (Rest of the Tab 4 code remains the same)
         
         c1, c2 = st.columns(2)
         with c1:
@@ -495,4 +510,5 @@ if df_raw is not None:
 
 else:
     st.error("🚨 DATABASE CONNECTION ERROR: Please upload 'cleaned_ai_impact_data_updated.csv'")
+
 
