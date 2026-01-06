@@ -165,7 +165,7 @@ st.markdown("""
 # --- 3. ROBUST DATA LOADING ---
 @st.cache_data
 def get_dataset():
-    file_path = 'cleaned_ai_impact_data_updated.csv'
+    file_path = 'cleaned_ai_impact_data.csv'
     for enc in ['utf-8', 'ISO-8859-1', 'latin1']:
         try:
             df = pd.read_csv(file_path, encoding=enc)
@@ -495,3 +495,4 @@ if df_raw is not None:
 
 else:
     st.error("🚨 DATABASE CONNECTION ERROR: Please upload 'cleaned_ai_impact_data_updated.csv'")
+
